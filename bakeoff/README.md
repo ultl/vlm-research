@@ -71,6 +71,42 @@ python3 bakeoff/score.py --model qwen25vl
 python3 bakeoff/report.py
 ```
 
+## Running without Docker (micromamba)
+The harness runs natively — Docker only *supplies* isolated deps. If your env has
+a model's deps, run it directly (reuses your torch, no image build, no multi-GB
+download):
+```sh
+micromamba activate <env>
+bakeoff/run_native.sh                 # internvl3 + qwen25vl (shared transformers stack)
+bakeoff/run_native.sh internvl3       # just one
+```
+The five models split into **conflicting stacks**, so one env can't hold all.
+Make a per-model env for the others (lighter than Docker, you manage the envs):
+```sh
+# transformers VLMs — internvl3, qwen25vl
+micromamba create -n vlm python=3.10 -c conda-forge && micromamba activate vlm
+pip install torch torchvision transformers==4.51.3 accelerate timm einops \
+            sentencepiece qwen-vl-utils pillow
+bakeoff/run_native.sh internvl3 qwen25vl
+
+# DeepSeek-OCR — older transformers + torch 2.6
+micromamba create -n dsocr python=3.10 -c conda-forge && micromamba activate dsocr
+pip install torch==2.6.0 transformers==4.46.3 tokenizers==0.20.3 einops addict easydict pillow
+bakeoff/run_native.sh deepseek_ocr
+
+# PaddleOCR-VL — Paddle stack (cu118 wheel; no cu121 build exists)
+micromamba create -n paddle python=3.10 -c conda-forge && micromamba activate paddle
+pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+pip install paddleocr==3.2.0
+bakeoff/run_native.sh paddleocr_vl
+
+# MinerU — its own pinned stack
+micromamba create -n mineru python=3.10 -c conda-forge && micromamba activate mineru
+pip install "mineru[core]==2.5.4"
+bakeoff/run_native.sh mineru
+```
+Scoring is env-agnostic, so `report.py` merges results across all of them at the end.
+
 ## Reproducibility
 - Pin the base image by digest for a frozen run; record CUDA/GPU (captured in `run.json` via the adapter's `env_info`).
 - Decode is greedy (`temperature=0`) and recorded per page in `meta.json`.
