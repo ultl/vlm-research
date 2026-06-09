@@ -16,6 +16,14 @@
       "uses_prompt": true,
       "exposes_tokens": true,
       "decode": { "temperature": 0.0, "max_new_tokens": 4096, "seed": 0 }
+    },
+    "mineru": {
+      "adapter": "mineru",
+      "model_id": "opendatalab/MinerU2.5-2509-1.2B",
+      "accepts": "pdf",
+      "uses_prompt": false,
+      "exposes_tokens": false,
+      "backend": "vlm-transformers"
     }
   }
 }

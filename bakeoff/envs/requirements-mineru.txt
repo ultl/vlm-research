@@ -1,0 +1,4 @@
+# MinerU brings its own pinned torch/transformers stack via the [core] extra, so
+# we let it own those rather than pinning torch separately (avoids conflicts).
+# VERIFY-ON-VM: confirm the version exposes the `-b vlm-transformers` backend.
+mineru[core]==2.5.4
