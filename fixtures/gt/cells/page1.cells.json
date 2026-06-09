@@ -1,0 +1,208 @@
+{
+  "meta": {
+    "page": 1,
+    "form": "FA2204",
+    "title": "確定申告書 第一表（令和六年分 所得税及び復興特別所得税）",
+    "source_sha256": "3c5089cf1a79c5748bb4aba2f7cf73dcc840206ebcce23016d3c9f80aa9b0391",
+    "status_legend": "filled = has value | empty = confirmed blank | unread = not legibly transcribed",
+    "spec": "../schema.md",
+    "scored": "../scored_mask.md",
+    "coverage_note": "Form is near-blank. Many cells carry ambiguous '0000'/'000' marks (handwritten zeros vs printed guide-dots) → marked unread, not asserted empty. Only two real figures legibly read."
+  },
+  "header": [
+    {
+      "id": "h.address",
+      "label_ja": "住所",
+      "label_en": "address",
+      "value": "佐久市下越289",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.name",
+      "label_ja": "氏名",
+      "label_en": "name",
+      "value": "髙橋大介",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.seiri",
+      "label_ja": "整理番号",
+      "label_en": "reference no.",
+      "value": null,
+      "status": "empty",
+      "conf": "M"
+    }
+  ],
+  "income_amounts": [
+    {
+      "id": "i.a",
+      "no": "㋐",
+      "label_ja": "事業 営業等",
+      "label_en": "business: sales etc.",
+      "value": null,
+      "status": "empty",
+      "conf": "M"
+    },
+    {
+      "id": "i.i",
+      "no": "㋑",
+      "label_ja": "事業 農業",
+      "label_en": "business: agriculture",
+      "value": 8264854,
+      "status": "filled",
+      "conf": "L",
+      "note": "single read; CONFLICTS with page2 計⑦ 4457075 — EXCLUDED"
+    },
+    {
+      "id": "i.u",
+      "no": "㋒",
+      "label_ja": "不動産",
+      "label_en": "real estate",
+      "value": null,
+      "status": "empty",
+      "conf": "M"
+    },
+    {
+      "id": "i.rest",
+      "no": "㋓+",
+      "label_ja": "利子・配当・給与・雑・譲渡 等",
+      "label_en": "interest/dividend/salary/misc/transfer",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "grouped": true,
+      "note": "katakana rows from ㋓(利子) onward; appeared blank but extent not individually verified — no fabricated endpoint"
+    }
+  ],
+  "income_after_amounts": [
+    {
+      "id": "a.2",
+      "no": "2",
+      "label_ja": "所得金額 事業 農業",
+      "label_en": "income: agriculture",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "expected ~2684984 (=3334984−650000); not legibly read"
+    },
+    {
+      "id": "a.rest",
+      "no": "1,3-12",
+      "label_ja": "その他所得金額",
+      "label_en": "other income amounts",
+      "value": null,
+      "status": "empty",
+      "conf": "M",
+      "grouped": true
+    }
+  ],
+  "deductions": [
+    {
+      "id": "d.13_16",
+      "no": "13-16",
+      "label_ja": "社会保険料/小規模共済/生命保険/地震保険 控除",
+      "label_en": "insurance deductions",
+      "value": null,
+      "status": "empty",
+      "conf": "M",
+      "grouped": true
+    },
+    {
+      "id": "d.17_18",
+      "no": "17-18",
+      "label_ja": "寡婦/ひとり親・勤労学生/障害者 控除",
+      "label_en": "widow/single-parent, student/disability",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "'0000' marks present, ambiguous",
+      "grouped": true
+    },
+    {
+      "id": "d.23_24",
+      "no": "23-24",
+      "label_ja": "扶養控除・基礎控除",
+      "label_en": "dependent/basic deduction",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "'0000' marks present, ambiguous",
+      "grouped": true
+    },
+    {
+      "id": "d.25_29",
+      "no": "25-29",
+      "label_ja": "計・雑損・医療費・寄附金 控除 合計",
+      "label_en": "deduction totals",
+      "value": null,
+      "status": "empty",
+      "conf": "M",
+      "grouped": true
+    }
+  ],
+  "tax_calc": [
+    {
+      "id": "t.30",
+      "no": "30",
+      "label_ja": "課税される所得金額（⑫−㉙）又は第三表",
+      "label_en": "taxable income",
+      "value": null,
+      "status": "unread",
+      "conf": "L"
+    },
+    {
+      "id": "t.31_47",
+      "no": "31-47",
+      "label_ja": "税額・各種税額控除・復興特別所得税 等",
+      "label_en": "tax & credits",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "section essentially blank / trailing-0 marks",
+      "grouped": true
+    },
+    {
+      "id": "t.53",
+      "no": "53",
+      "label_ja": "第3期分の税額 納める税金",
+      "label_en": "3rd-period tax due",
+      "value": null,
+      "status": "unread",
+      "conf": "L"
+    }
+  ],
+  "other": [
+    {
+      "id": "o.59",
+      "no": "59",
+      "label_ja": "専従者給与（控除）額の合計額",
+      "label_en": "family-salary total",
+      "value": null,
+      "status": "empty",
+      "conf": "M"
+    },
+    {
+      "id": "o.60",
+      "no": "60",
+      "label_ja": "青色申告特別控除額",
+      "label_en": "blue-return deduction",
+      "value": 650000,
+      "status": "filled",
+      "conf": "M",
+      "note": "standard 65万; cross-consistent with page2 ㊻"
+    },
+    {
+      "id": "o.66_67",
+      "no": "66-67",
+      "label_ja": "申告期限までに納付する金額・延納届出額",
+      "label_en": "amount to pay / deferral",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "trailing-0 marks",
+      "grouped": true
+    }
+  ]
+}

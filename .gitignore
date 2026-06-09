@@ -8,7 +8,6 @@ scores/
 .hf_cache/
 *.safetensors
 *.bin
-# real document + derived gold = PII (tax return). Never push to a public repo;
-# transfer to the VM out-of-band (scp). See bakeoff/README.md "Data".
+# PII (tax return). Repo is PRIVATE; fixtures/ (derived gold + page images) is
+# tracked here. sample.pdf (the raw scan) stays out unless intentionally added.
 sample.pdf
-fixtures/

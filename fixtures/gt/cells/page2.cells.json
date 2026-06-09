@@ -1,0 +1,424 @@
+{
+  "meta": {
+    "page": 2,
+    "form": "FA3100",
+    "title": "所得税青色申告決算書（農業所得用）損益計算書",
+    "source_sha256": "3c5089cf1a79c5748bb4aba2f7cf73dcc840206ebcce23016d3c9f80aa9b0391",
+    "status_legend": "filled = has value | empty = confirmed blank | unread = not legibly transcribed",
+    "spec": "../schema.md",
+    "scored": "../scored_mask.md"
+  },
+  "header": [
+    {
+      "id": "h.address",
+      "label_ja": "住所",
+      "label_en": "address",
+      "value": "佐久市下越289",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.industry",
+      "label_ja": "業種名",
+      "label_en": "business type",
+      "value": "農業",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.farm_name",
+      "label_ja": "農園名",
+      "label_en": "farm name",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "kana, unclear"
+    },
+    {
+      "id": "h.kana",
+      "label_ja": "フリガナ",
+      "label_en": "name reading",
+      "value": "タカハシ ダイスケ",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.name",
+      "label_ja": "氏名",
+      "label_en": "name",
+      "value": "髙橋大介",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.phone",
+      "label_ja": "電話番号",
+      "label_en": "phone",
+      "value": "095-2853-4416",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.tax_agent_phone",
+      "label_ja": "依頼税理士 電話番号",
+      "label_en": "tax agent phone",
+      "value": "095-2853-4416",
+      "status": "filled",
+      "conf": "L"
+    }
+  ],
+  "income": [
+    {
+      "id": "pl.1",
+      "no": "1",
+      "label_ja": "販売金額",
+      "label_en": "sales",
+      "value": 1947075,
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "pl.2",
+      "no": "2",
+      "label_ja": "家事消費・事業消費金額",
+      "label_en": "home/business consumption",
+      "value": 1510000,
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "pl.3",
+      "no": "3",
+      "label_ja": "雑収入",
+      "label_en": "misc income",
+      "value": 1000000,
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "pl.4",
+      "no": "4",
+      "label_ja": "小計（①+②+③）",
+      "label_en": "subtotal",
+      "value": 4457075,
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "pl.5",
+      "no": "5",
+      "label_ja": "農産物の棚卸高 期首",
+      "label_en": "opening inventory",
+      "value": 0,
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "pl.6",
+      "no": "6",
+      "label_ja": "農産物の棚卸高 期末",
+      "label_en": "closing inventory",
+      "value": 0,
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "pl.7",
+      "no": "7",
+      "label_ja": "計（④−⑤+⑥）",
+      "label_en": "income total",
+      "value": 4457075,
+      "status": "filled",
+      "conf": "H"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "e.8",
+      "no": "8",
+      "label_ja": "租税公課",
+      "label_en": "taxes & public dues",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.9",
+      "no": "9",
+      "label_ja": "種苗費",
+      "label_en": "seeds/seedlings",
+      "value": 27685,
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "e.10",
+      "no": "10",
+      "label_ja": "素畜費",
+      "label_en": "livestock",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.11",
+      "no": "11",
+      "label_ja": "肥料費",
+      "label_en": "fertilizer",
+      "value": 12638,
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "e.12",
+      "no": "12",
+      "label_ja": "飼料費",
+      "label_en": "feed",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.13",
+      "no": "13",
+      "label_ja": "農具費",
+      "label_en": "farm tools",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.14",
+      "no": "14",
+      "label_ja": "農薬衛生費",
+      "label_en": "pesticide/hygiene",
+      "value": 78730,
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "e.15",
+      "no": "15",
+      "label_ja": "諸材料費",
+      "label_en": "materials",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.16",
+      "no": "16",
+      "label_ja": "修繕費",
+      "label_en": "repairs",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.17",
+      "no": "17",
+      "label_ja": "動力光熱費",
+      "label_en": "power/utilities",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.18",
+      "no": "18",
+      "label_ja": "作業用衣料費",
+      "label_en": "work clothing",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.19",
+      "no": "19",
+      "label_ja": "農業共済掛金",
+      "label_en": "mutual aid premium",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.20",
+      "no": "20",
+      "label_ja": "減価償却費",
+      "label_en": "depreciation",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "expected nonzero from reconciliation gap, not legibly read"
+    },
+    {
+      "id": "e.21",
+      "no": "21",
+      "label_ja": "荷造運賃手数料",
+      "label_en": "packing/freight",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.22",
+      "no": "22",
+      "label_ja": "雇人費",
+      "label_en": "employee labor",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.23",
+      "no": "23",
+      "label_ja": "利子割引料",
+      "label_en": "interest/discount",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.24",
+      "no": "24",
+      "label_ja": "地代・賃借料",
+      "label_en": "rent/lease",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.25",
+      "no": "25",
+      "label_ja": "土地改良費",
+      "label_en": "land improvement",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.26_29",
+      "no": "26-29",
+      "label_ja": "（空欄費目）",
+      "label_en": "blank expense rows",
+      "value": null,
+      "status": "empty",
+      "conf": "H",
+      "grouped": true
+    },
+    {
+      "id": "e.30",
+      "no": "30",
+      "label_ja": "雑費",
+      "label_en": "misc expense",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.31",
+      "no": "31",
+      "label_ja": "小計",
+      "label_en": "expense subtotal",
+      "value": null,
+      "status": "unread",
+      "conf": "L"
+    },
+    {
+      "id": "e.32",
+      "no": "32",
+      "label_ja": "農産物以外の棚卸高 期首",
+      "label_en": "non-produce opening inv.",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.33",
+      "no": "33",
+      "label_ja": "農産物以外の棚卸高 期末",
+      "label_en": "non-produce closing inv.",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "e.35",
+      "no": "35",
+      "label_ja": "経費計",
+      "label_en": "total expenses",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "implied ~1,122,091 from ⑦−㊻; not legibly read"
+    }
+  ],
+  "result": [
+    {
+      "id": "r.36",
+      "no": "36",
+      "label_ja": "差引金額（⑦−㉟）",
+      "label_en": "net (income−expense)",
+      "value": null,
+      "status": "unread",
+      "conf": "L"
+    },
+    {
+      "id": "r.40",
+      "no": "40",
+      "label_ja": "各種引当金・準備金 繰戻額等 計",
+      "label_en": "reserves reversed total",
+      "value": 0,
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "r.41",
+      "no": "41",
+      "label_ja": "専従者給与",
+      "label_en": "family employee salary",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    },
+    {
+      "id": "r.45",
+      "no": "45",
+      "label_ja": "繰入額等 計",
+      "label_en": "reserves added total",
+      "value": 0,
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "r.46",
+      "no": "46",
+      "label_ja": "青色申告特別控除前の所得金額",
+      "label_en": "income before blue deduction",
+      "value": 3334984,
+      "status": "filled",
+      "conf": "M",
+      "note": "does not reconcile with read expenses"
+    },
+    {
+      "id": "r.47",
+      "no": "47",
+      "label_ja": "青色申告特別控除額",
+      "label_en": "blue-return deduction",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "expected 650000 (cf. page1 #60); not legibly read here"
+    },
+    {
+      "id": "r.48",
+      "no": "48",
+      "label_ja": "所得金額（㊻−㊼）",
+      "label_en": "income amount",
+      "value": null,
+      "status": "unread",
+      "conf": "L",
+      "note": "expected 2684984"
+    }
+  ]
+}

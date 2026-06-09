@@ -1,0 +1,226 @@
+{
+  "meta": {
+    "page": 3,
+    "form": "FA3125",
+    "title": "収入金額の内訳",
+    "source_sha256": "3c5089cf1a79c5748bb4aba2f7cf73dcc840206ebcce23016d3c9f80aa9b0391",
+    "status_legend": "filled = has value | empty = confirmed blank | unread = not legibly transcribed",
+    "spec": "../schema.md",
+    "scored": "../scored_mask.md"
+  },
+  "header": [
+    {
+      "id": "h.year",
+      "label_ja": "令和○年分",
+      "label_en": "tax year",
+      "value": "R06",
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "h.kana",
+      "label_ja": "フリガナ",
+      "label_en": "name reading",
+      "value": "タカハシ ダイスケ",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.name",
+      "label_ja": "氏名",
+      "label_en": "name",
+      "value": "髙橋大介",
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "h.seiri",
+      "label_ja": "整理番号",
+      "label_en": "reference no.",
+      "value": null,
+      "status": "empty",
+      "conf": "H"
+    }
+  ],
+  "table_A_income_breakdown": {
+    "label_ja": "収入金額の内訳 (A)",
+    "label_en": "income breakdown",
+    "columns": [
+      "category",
+      "planted_area",
+      "harvest_qty",
+      "opening_inv_amt",
+      "sales_amount",
+      "home_business_consumption",
+      "closing_inv_amt"
+    ],
+    "units": {
+      "planted_area": "a (are)"
+    },
+    "rows": [
+      {
+        "category": "根菜類",
+        "planted_area": 150,
+        "sales_amount": 947075,
+        "home_business_consumption": 1510000,
+        "closing_inv_amt": 0,
+        "status": "filled",
+        "conf": "L"
+      },
+      {
+        "category": "葉菜類",
+        "planted_area": 150,
+        "sales_amount": 200000,
+        "home_business_consumption": 0,
+        "closing_inv_amt": 0,
+        "status": "filled",
+        "conf": "L"
+      },
+      {
+        "category": "果菜類",
+        "planted_area": 250,
+        "sales_amount": 200000,
+        "home_business_consumption": 0,
+        "closing_inv_amt": 0,
+        "status": "filled",
+        "conf": "L"
+      },
+      {
+        "category": "軟弱野菜",
+        "planted_area": null,
+        "sales_amount": 200000,
+        "home_business_consumption": 0,
+        "closing_inv_amt": 0,
+        "status": "filled",
+        "conf": "L"
+      },
+      {
+        "category": "杯橋?",
+        "planted_area": 450,
+        "sales_amount": 300000,
+        "home_business_consumption": 0,
+        "closing_inv_amt": 0,
+        "status": "filled",
+        "conf": "L"
+      }
+    ],
+    "totals": {
+      "sales_amount_1": {
+        "value": 1947075,
+        "status": "filled",
+        "conf": "H"
+      },
+      "home_business_consumption_2": {
+        "value": 1510000,
+        "status": "filled",
+        "conf": "H"
+      }
+    },
+    "consistency_check": {
+      "rule": "sum(rows.sales_amount)==total_1",
+      "row_sum": 1847075,
+      "total": 1947075,
+      "status": "FAIL — one row misread; rows EXCLUDED"
+    }
+  },
+  "misc_income": [
+    {
+      "id": "m.subsidy",
+      "label_ja": "補助金",
+      "label_en": "subsidy",
+      "value": 500000,
+      "status": "filled",
+      "conf": "H"
+    },
+    {
+      "id": "m.insurance",
+      "label_ja": "収入保険料補てん金",
+      "label_en": "income-insurance compensation",
+      "value": 500000,
+      "status": "filled",
+      "conf": "M"
+    },
+    {
+      "id": "m.3",
+      "no": "3",
+      "label_ja": "合計",
+      "label_en": "misc income total",
+      "value": 1000000,
+      "status": "filled",
+      "conf": "H"
+    }
+  ],
+  "table_B_non_produce_inventory": {
+    "label_ja": "農産物以外の棚卸高の内訳 (B)",
+    "label_en": "non-produce inventory",
+    "rows": [
+      {
+        "category": "未収穫農産物",
+        "status": "empty",
+        "conf": "H"
+      },
+      {
+        "category": "販売用動物",
+        "status": "empty",
+        "conf": "H"
+      },
+      {
+        "category": "種苗・飼料・肥料・農薬・諸材料",
+        "status": "empty",
+        "conf": "H"
+      },
+      {
+        "category": "その他",
+        "status": "empty",
+        "conf": "H"
+      }
+    ],
+    "totals": {
+      "opening_32": {
+        "value": null,
+        "status": "empty",
+        "conf": "H"
+      },
+      "closing_33": {
+        "value": null,
+        "status": "empty",
+        "conf": "H"
+      }
+    }
+  },
+  "table_C_employee_cost": {
+    "label_ja": "雇人費の内訳 (C)",
+    "label_en": "employee labor cost",
+    "rows": [
+      {
+        "status": "empty",
+        "conf": "H"
+      }
+    ],
+    "totals": {
+      "total_22": {
+        "value": 0,
+        "status": "filled",
+        "conf": "M",
+        "note": "handwritten 0 in 合計"
+      }
+    }
+  },
+  "table_D_family_salary": {
+    "label_ja": "専従者給与の内訳 (D)",
+    "label_en": "family employee salary",
+    "rows": [
+      {
+        "status": "empty",
+        "conf": "H"
+      }
+    ],
+    "totals": {
+      "total_41": {
+        "value": null,
+        "status": "empty",
+        "conf": "H"
+      }
+    }
+  }
+}

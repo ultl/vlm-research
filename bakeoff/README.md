@@ -29,16 +29,15 @@ report.py   scores/ -> scorecard                  (CPU)
 - `pageN.meta.json` — latency, tokens, image hash, decode params, status
 - `run.json` — provenance: model + image digest + code SHA + prompt + pdf hash
 
-## Data (not in this repo)
-`sample.pdf` and `fixtures/` are a real tax return (PII) and are **gitignored** —
-they never go to this public repo. Supply them out-of-band before running:
+## Data (PII — repo is PRIVATE)
+This repo holds a real tax return (PII); keep it **private**. `fixtures/` (gold +
+page images) is tracked here. The raw `sample.pdf` is gitignored — `render.py`
+regenerates `fixtures/pages/` from it, so supply it out-of-band if you need to
+re-render:
 ```sh
-# from your machine, into the pulled repo on the VM
 scp sample.pdf user@vm:/path/vlm-research/
-scp -r fixtures  user@vm:/path/vlm-research/
 ```
-`render.py` can regenerate `fixtures/pages/` from `sample.pdf`, but the gold
-(`fixtures/gt/`) must be copied over.
+The gold (`fixtures/gt/`) is already in the repo, so most runs need no scp.
 
 ## CPU side (no GPU needed)
 ```sh
