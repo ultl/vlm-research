@@ -3,6 +3,19 @@
 Run several open-source document VLMs on the scanned `sample.pdf` and score them
 against the hand-verified gold in `fixtures/gt/`. Develop on CPU, run on a GPU VM.
 
+## Models (5)
+| Key | Model | Size | Path | Notes |
+|---|---|---|---|---|
+| `qwen25vl` | Qwen2.5-VL-7B | 7B | images | VRAM ceiling (~16–20 GB) |
+| `internvl3` | InternVL3-2B | 2B | images | dynamic tiling (`max_tiles`) |
+| `deepseek_ocr` | DeepSeek-OCR | ~3B | images | optical compression; transformers 4.46 pin |
+| `mineru` | MinerU2.5 | 1.2B | pdf | pipeline parser; `*VERIFY-ON-VM*` CLI |
+| `paddleocr_vl` | PaddleOCR-VL | 0.9B | pdf | Paddle stack; `*VERIFY-ON-VM*` pipeline |
+
+Each runs in its own Docker image (incompatible dep stacks). `VERIFY-ON-VM` marks
+model-specific calls (CLI flags / API) whose exact form may need a tweak on first
+run; the harness integration around them is validated.
+
 ## Pipeline
 ```
 render.py   pdf -> fixtures/pages/*.png          (CPU)

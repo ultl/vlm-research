@@ -70,5 +70,51 @@ services:
               count: all
               capabilities: [gpu]
 
+  deepseek_ocr:
+    build:
+      context: ..
+      dockerfile: bakeoff/docker/Dockerfile.deepseek_ocr
+    image: vlm-bakeoff/deepseek_ocr
+    command: ["--model", "deepseek_ocr"]
+    environment:
+      HF_HOME: /hf_cache
+      BAKEOFF_IMAGE_DIGEST: "${BAKEOFF_IMAGE_DIGEST:-local}"
+      BAKEOFF_CODE_SHA: "${BAKEOFF_CODE_SHA:-}"
+    volumes:
+      - ../fixtures:/app/fixtures:ro
+      - ../sample.pdf:/app/sample.pdf:ro
+      - ../runs:/app/runs
+      - hf_cache:/hf_cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  paddleocr_vl:
+    build:
+      context: ..
+      dockerfile: bakeoff/docker/Dockerfile.paddleocr_vl
+    image: vlm-bakeoff/paddleocr_vl
+    command: ["--model", "paddleocr_vl"]
+    environment:
+      HF_HOME: /hf_cache
+      BAKEOFF_IMAGE_DIGEST: "${BAKEOFF_IMAGE_DIGEST:-local}"
+      BAKEOFF_CODE_SHA: "${BAKEOFF_CODE_SHA:-}"
+    volumes:
+      - ../fixtures:/app/fixtures:ro
+      - ../sample.pdf:/app/sample.pdf:ro
+      - ../runs:/app/runs
+      - hf_cache:/hf_cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
 volumes:
   hf_cache:

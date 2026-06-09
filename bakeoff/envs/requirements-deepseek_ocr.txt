@@ -1,0 +1,9 @@
+# DeepSeek-OCR pins an older transformers + torch 2.6 (installed in Dockerfile).
+# flash-attn speeds the vision encoder but is hard to build; we default to eager
+# attention (config decode.attn) and leave flash-attn optional. VERIFY-ON-VM.
+transformers==4.46.3
+tokenizers==0.20.3
+einops==0.8.0
+addict==2.4.0
+easydict==1.13
+pillow==11.0.0

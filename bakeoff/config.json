@@ -32,6 +32,21 @@
       "uses_prompt": true,
       "exposes_tokens": true,
       "decode": { "temperature": 0.0, "max_new_tokens": 4096, "seed": 0, "max_tiles": 12 }
+    },
+    "deepseek_ocr": {
+      "adapter": "deepseek_ocr",
+      "model_id": "deepseek-ai/DeepSeek-OCR",
+      "accepts": "images",
+      "uses_prompt": true,
+      "exposes_tokens": true,
+      "decode": { "base_size": 1024, "image_size": 640, "crop_mode": true, "attn": "eager" }
+    },
+    "paddleocr_vl": {
+      "adapter": "paddleocr_vl",
+      "model_id": "PaddlePaddle/PaddleOCR-VL",
+      "accepts": "pdf",
+      "uses_prompt": false,
+      "exposes_tokens": false
     }
   }
 }
