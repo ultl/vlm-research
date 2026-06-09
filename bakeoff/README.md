@@ -51,8 +51,15 @@ python3 bakeoff/report.py
 Requires Docker + the NVIDIA Container Toolkit (`nvidia-ctk`). Single 24 GB GPU
 (L4 / A10 / 4090) covers the 7B at fp16.
 
+One command does everything (build → run → score every model → scorecard):
 ```sh
-git pull
+bakeoff/run_all.sh                       # all five, smallest-VRAM first
+bakeoff/run_all.sh paddleocr_vl mineru internvl3 deepseek_ocr   # skip the 7B on a small GPU
+```
+It runs models one at a time (each gets the full GPU) and skips past any that fail.
+
+Or step through one model manually:
+```sh
 export BAKEOFF_CODE_SHA=$(git rev-parse HEAD)
 docker compose -f bakeoff/docker-compose.yml build qwen25vl
 docker compose -f bakeoff/docker-compose.yml run --rm qwen25vl   # writes runs/qwen25vl/
