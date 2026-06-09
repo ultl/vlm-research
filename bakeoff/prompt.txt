@@ -1,0 +1,3 @@
+Transcribe this page to Markdown.
+Preserve the table structure, reading order, and every field label.
+Leave blank fields blank — do not guess or invent any value.

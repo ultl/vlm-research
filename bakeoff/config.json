@@ -1,0 +1,21 @@
+{
+  "paths": {
+    "pdf": "sample.pdf",
+    "pages": "fixtures/pages",
+    "gold": "fixtures/gt/cells",
+    "runs": "runs",
+    "scores": "scores",
+    "prompt": "bakeoff/prompt.txt"
+  },
+  "pages": ["page1", "page2", "page3"],
+  "models": {
+    "qwen25vl": {
+      "adapter": "qwen25vl",
+      "model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+      "accepts": "images",
+      "uses_prompt": true,
+      "exposes_tokens": true,
+      "decode": { "temperature": 0.0, "max_new_tokens": 4096, "seed": 0 }
+    }
+  }
+}

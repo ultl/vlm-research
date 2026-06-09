@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+# experiment outputs — regenerable, never committed
+runs/
+scores/
+# model weights / HF cache — never committed
+.hf_cache/
+*.safetensors
+*.bin
+# real document + derived gold = PII (tax return). Never push to a public repo;
+# transfer to the VM out-of-band (scp). See bakeoff/README.md "Data".
+sample.pdf
+fixtures/

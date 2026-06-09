@@ -1,0 +1,28 @@
+# One service per model; shared read-only fixtures, writable runs/, shared HF
+# weight cache. GPU reserved via the nvidia container runtime.
+services:
+  qwen25vl:
+    build:
+      context: ..
+      dockerfile: bakeoff/docker/Dockerfile.qwen25vl
+    image: vlm-bakeoff/qwen25vl
+    command: ["--model", "qwen25vl"]
+    environment:
+      HF_HOME: /hf_cache
+      BAKEOFF_IMAGE_DIGEST: "${BAKEOFF_IMAGE_DIGEST:-local}"
+      BAKEOFF_CODE_SHA: "${BAKEOFF_CODE_SHA:-}"
+    volumes:
+      - ../fixtures:/app/fixtures:ro
+      - ../sample.pdf:/app/sample.pdf:ro
+      - ../runs:/app/runs
+      - hf_cache:/hf_cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  hf_cache:

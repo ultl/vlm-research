@@ -1,0 +1,5 @@
+# torch is installed separately in the Dockerfile (CUDA-specific index).
+transformers==4.51.3
+accelerate==1.2.1
+qwen-vl-utils==0.0.8
+pillow==11.0.0
