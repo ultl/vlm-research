@@ -25,10 +25,13 @@ fi
 # --- preflight: fail fast on missing inputs ---
 [ -f sample.pdf ]        || { echo "FATAL: sample.pdf missing — scp it to the repo root"; exit 1; }
 [ -d fixtures/gt/cells ] || { echo "FATAL: fixtures/gt missing — scp fixtures/ to the repo root"; exit 1; }
-command -v docker  >/dev/null || { echo "FATAL: docker not found"; exit 1; }
-command -v python3 >/dev/null || { echo "FATAL: python3 not found (needed for scoring)"; exit 1; }
+command -v docker >/dev/null || { echo "FATAL: docker not found"; exit 1; }
+# auto-detect the interpreter (micromamba/conda env may expose `python`, not `python3`)
+PY="$(command -v python3 || command -v python || true)"
+[ -n "$PY" ] || { echo "FATAL: no python found (python3 or python) — activate your env first"; exit 1; }
 
 echo "models: ${MODELS[*]}"
+echo "python: $PY"
 echo "code sha: $BAKEOFF_CODE_SHA"
 
 declare -a DONE FAILED
@@ -37,13 +40,13 @@ for m in "${MODELS[@]}"; do
   echo "==================== $m ===================="
   if ! $COMPOSE build "$m";        then echo "[$m] BUILD failed"; FAILED+=("$m:build"); continue; fi
   if ! $COMPOSE run --rm "$m";     then echo "[$m] RUN failed";   FAILED+=("$m:run");   continue; fi
-  if ! python3 bakeoff/score.py --model "$m"; then echo "[$m] SCORE failed"; FAILED+=("$m:score"); continue; fi
+  if ! "$PY" bakeoff/score.py --model "$m"; then echo "[$m] SCORE failed"; FAILED+=("$m:score"); continue; fi
   DONE+=("$m")
 done
 
 echo
 echo "==================== scorecard ===================="
-python3 bakeoff/report.py || echo "(report skipped — no scores yet)"
+"$PY" bakeoff/report.py || echo "(report skipped — no scores yet)"
 
 echo
 echo "finished. ok: ${DONE[*]:-none}  |  failed: ${FAILED[*]:-none}"
