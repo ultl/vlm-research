@@ -47,5 +47,28 @@ services:
               count: all
               capabilities: [gpu]
 
+  internvl3:
+    build:
+      context: ..
+      dockerfile: bakeoff/docker/Dockerfile.internvl3
+    image: vlm-bakeoff/internvl3
+    command: ["--model", "internvl3"]
+    environment:
+      HF_HOME: /hf_cache
+      BAKEOFF_IMAGE_DIGEST: "${BAKEOFF_IMAGE_DIGEST:-local}"
+      BAKEOFF_CODE_SHA: "${BAKEOFF_CODE_SHA:-}"
+    volumes:
+      - ../fixtures:/app/fixtures:ro
+      - ../sample.pdf:/app/sample.pdf:ro
+      - ../runs:/app/runs
+      - hf_cache:/hf_cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
 volumes:
   hf_cache:

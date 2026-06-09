@@ -24,6 +24,14 @@
       "uses_prompt": false,
       "exposes_tokens": false,
       "backend": "vlm-transformers"
+    },
+    "internvl3": {
+      "adapter": "internvl3",
+      "model_id": "OpenGVLab/InternVL3-2B",
+      "accepts": "images",
+      "uses_prompt": true,
+      "exposes_tokens": true,
+      "decode": { "temperature": 0.0, "max_new_tokens": 4096, "seed": 0, "max_tiles": 12 }
     }
   }
 }
