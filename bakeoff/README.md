@@ -3,6 +3,27 @@
 Run several open-source document VLMs on the scanned `sample.pdf` and score them
 against the hand-verified gold in `fixtures/gt/`. Develop on CPU, run on a GPU VM.
 
+## Quickstart — native on the GPU VM (no Docker, recommended)
+Light path: reuse your env's torch, no image builds. Copy-paste, top to bottom:
+```sh
+# 0. one-time env — Python 3.11 (NOT 3.13/3.14: torch has no wheels there yet; 3.10 also fine)
+micromamba create -n vlm python=3.11 -y && micromamba activate vlm
+pip install torch torchvision transformers==4.51.3 accelerate timm einops \
+            sentencepiece qwen-vl-utils pillow      # plain torch — NO --index-url on a working VM
+
+# 1. weights cache on a big disk (default ~/.cache is usually too small)
+export HF_HOME=/mnt/data/<you>/hf_cache             # add to ~/.bashrc to persist
+
+# 2. data — fixtures/ is already in the repo; only the raw PDF needs copying over
+ls sample.pdf || echo "scp sample.pdf to the repo root first"
+
+# 3. run + score; pick a free GPU (nvidia-smi to check which)
+CUDA_VISIBLE_DEVICES=0 bakeoff/run_native.sh internvl3 qwen25vl
+python bakeoff/report.py
+```
+That covers the two transformers VLMs. The other three need their own env (see
+"Running without Docker" below) or Docker. See "Gotchas" if anything errors.
+
 ## Models (5)
 | Key | Model | Size | Path | Notes |
 |---|---|---|---|---|
@@ -84,24 +105,24 @@ The five models split into **conflicting stacks**, so one env can't hold all.
 Make a per-model env for the others (lighter than Docker, you manage the envs):
 ```sh
 # transformers VLMs — internvl3, qwen25vl
-micromamba create -n vlm python=3.10 -c conda-forge && micromamba activate vlm
+micromamba create -n vlm python=3.11 -c conda-forge && micromamba activate vlm
 pip install torch torchvision transformers==4.51.3 accelerate timm einops \
             sentencepiece qwen-vl-utils pillow
 bakeoff/run_native.sh internvl3 qwen25vl
 
 # DeepSeek-OCR — older transformers + torch 2.6
-micromamba create -n dsocr python=3.10 -c conda-forge && micromamba activate dsocr
+micromamba create -n dsocr python=3.11 -c conda-forge && micromamba activate dsocr
 pip install torch==2.6.0 transformers==4.46.3 tokenizers==0.20.3 einops addict easydict pillow
 bakeoff/run_native.sh deepseek_ocr
 
 # PaddleOCR-VL — Paddle stack (cu118 wheel; no cu121 build exists)
-micromamba create -n paddle python=3.10 -c conda-forge && micromamba activate paddle
+micromamba create -n paddle python=3.11 -c conda-forge && micromamba activate paddle
 pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
 pip install paddleocr==3.2.0
 bakeoff/run_native.sh paddleocr_vl
 
 # MinerU — its own pinned stack
-micromamba create -n mineru python=3.10 -c conda-forge && micromamba activate mineru
+micromamba create -n mineru python=3.11 -c conda-forge && micromamba activate mineru
 pip install "mineru[core]==2.5.4"
 bakeoff/run_native.sh mineru
 ```
@@ -110,6 +131,17 @@ Scoring is env-agnostic, so `report.py` merges results across all of them at the
 ## Reproducibility
 - Pin the base image by digest for a frozen run; record CUDA/GPU (captured in `run.json` via the adapter's `env_info`).
 - Decode is greedy (`temperature=0`) and recorded per page in `meta.json`.
+
+## Gotchas (hit once, fixed — keep for next time)
+| Symptom | Cause | Fix |
+|---|---|---|
+| `No matching distribution found for torch==2.5.1` | Python 3.13/3.14 (no wheels) or wrong arch | use Python **3.11**; native install is just `pip install torch torchvision` (no `--index-url`) |
+| `apt-get … connection timed out` in a Docker build | VM blocks outbound port 80 | already fixed — Dockerfiles use **https** apt mirrors |
+| `paddlepaddle-gpu==3.0.0` not found | Paddle ships no `cu121` wheels | already fixed — Dockerfile uses the **cu118** index |
+| weights fill the disk / very slow first run | HF cache on a small root disk | `export HF_HOME=/big/disk/hf_cache` **before** the first run |
+| both GPUs used, or the wrong one | default device pick (`device_map="auto"` spans all) | prefix the command with `CUDA_VISIBLE_DEVICES=N` |
+| `score: no run found for '<model>'` | scoring where no `runs/<model>/` exists | run first (GPU box), then score there, or `scp -r …/runs/<model> ./runs/` |
+| run errored but others still ran | per-page error capture (by design) | `python bakeoff/score.py` skips it; read `runs/<model>/page1.meta.json` → `.error` |
 
 ## Adding a model
 Add a `models/<name>.py` exposing `build(model_cfg) -> Adapter`, a stanza in
