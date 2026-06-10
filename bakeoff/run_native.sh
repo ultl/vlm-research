@@ -31,7 +31,7 @@ MODELS=("$@")
 echo "python: $PY"
 echo "models: ${MODELS[*]}  (native, no Docker)"
 
-declare -a DONE FAILED
+DONE=(); FAILED=()      # explicit init — `declare -a` can trip `set -u` on empty arrays
 for m in "${MODELS[@]}"; do
   echo
   echo "==================== $m (native) ===================="
@@ -44,6 +44,8 @@ echo
 echo "==================== scorecard ===================="
 "$PY" bakeoff/report.py || echo "(report skipped — no scores yet)"
 
+ok_list="none";  [ ${#DONE[@]}   -gt 0 ] && ok_list="${DONE[*]}"
+bad_list="none"; [ ${#FAILED[@]} -gt 0 ] && bad_list="${FAILED[*]}"
 echo
-echo "finished. ok: ${DONE[*]:-none}  |  failed: ${FAILED[*]:-none}"
+echo "finished. ok: ${ok_list}  |  failed: ${bad_list}"
 [ ${#FAILED[@]} -eq 0 ] || echo "for a failure, inspect runs/<model>/page1.meta.json -> .error"
