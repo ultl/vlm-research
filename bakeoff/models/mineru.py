@@ -41,7 +41,8 @@ class MinerUAdapter(Adapter):
         # VERIFY-ON-VM: flags for MinerU 2.5. Expected form:
         #   mineru -p <pdf> -o <out> -b vlm-transformers
         cmd = ["mineru", "-p", pdf_path, "-o", out, "-b", self.backend]
-        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print(f"  $ {' '.join(cmd)}", flush=True)
+        subprocess.run(cmd, check=True)   # stream MinerU's own progress/download live
 
         content_list = self._find(out, "*_content_list.json")
         if content_list:

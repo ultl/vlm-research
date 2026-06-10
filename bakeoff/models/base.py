@@ -91,7 +91,9 @@ class Runner:
                 out_dir: Path, pdf_path: Path) -> dict:
         out_dir.mkdir(parents=True, exist_ok=True)
         started = _now()
+        print(f"[{adapter.name}] loading model (first run downloads weights)…", flush=True)
         adapter.load()
+        print(f"[{adapter.name}] model loaded", flush=True)
 
         if adapter.accepts == "images":
             recs, errors, total = self._run_images(
@@ -141,6 +143,7 @@ class Runner:
                 raise SystemExit(f"run: page image missing: {img}")
             status, err = "ok", None
             res = InferResult(text="")
+            print(f"[{adapter.name}] {name} inferring…", flush=True)
             t0 = time.perf_counter()
             try:
                 res = adapter.infer(str(img), prompt)
@@ -149,6 +152,7 @@ class Runner:
                 errors += 1
             latency = time.perf_counter() - t0
             total += latency
+            print(f"[{adapter.name}] {name} {status} in {latency:.1f}s", flush=True)
             self._write_page(out_dir, name, img, res, latency, "page",
                              decode, status, err)
             recs.append({"page": name, "status": status,
@@ -159,12 +163,16 @@ class Runner:
         # Pipeline tools ingest the whole PDF once; latency is doc-level.
         results: List[InferResult] = []
         run_err = None
+        print(f"[{adapter.name}] parsing whole PDF (slow on first run — weights "
+              f"download + page processing)…", flush=True)
         t0 = time.perf_counter()
         try:
             results = adapter.infer_pdf(str(pdf_path), prompt)
         except Exception:
             run_err = traceback.format_exc()
         total = time.perf_counter() - t0
+        print(f"[{adapter.name}] PDF parsed in {total:.1f}s "
+              f"({'ok' if run_err is None else 'error'})", flush=True)
         per_page = total / len(page_names) if page_names else total
 
         recs, errors = [], 0
