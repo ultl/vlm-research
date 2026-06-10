@@ -30,16 +30,21 @@ command -v docker >/dev/null || { echo "FATAL: docker not found"; exit 1; }
 PY="$(command -v python3 || command -v python || true)"
 [ -n "$PY" ] || { echo "FATAL: no python found (python3 or python) — activate your env first"; exit 1; }
 
+# forward GPU selection into the container (set CUDA_VISIBLE_DEVICES to pick a card)
+DEV_ARGS=""
+[ -n "${CUDA_VISIBLE_DEVICES:-}" ] && DEV_ARGS="-e CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}"
+
 echo "models: ${MODELS[*]}"
 echo "python: $PY"
+echo "gpu: ${CUDA_VISIBLE_DEVICES:-all visible}"
 echo "code sha: $BAKEOFF_CODE_SHA"
 
 DONE=(); FAILED=()      # explicit init — `declare -a` can trip `set -u` on empty arrays
 for m in "${MODELS[@]}"; do
   echo
   echo "==================== $m ===================="
-  if ! $COMPOSE build "$m";        then echo "[$m] BUILD failed"; FAILED+=("$m:build"); continue; fi
-  if ! $COMPOSE run --rm "$m";     then echo "[$m] RUN failed";   FAILED+=("$m:run");   continue; fi
+  if ! $COMPOSE build "$m";              then echo "[$m] BUILD failed"; FAILED+=("$m:build"); continue; fi
+  if ! $COMPOSE run --rm $DEV_ARGS "$m"; then echo "[$m] RUN failed";   FAILED+=("$m:run");   continue; fi
   if ! "$PY" bakeoff/score.py --model "$m"; then echo "[$m] SCORE failed"; FAILED+=("$m:score"); continue; fi
   DONE+=("$m")
 done
