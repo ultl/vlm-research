@@ -14,6 +14,8 @@ from .base import Adapter, InferResult
 class PaddleOCRVLAdapter(Adapter):
     name = "paddleocr_vl"
     accepts = "pdf"
+    # prompt-driven model, but only a closed task vocabulary (OCR:/Table Recognition:…)
+    # auto-selected by the layout stage on crops — no free-text hook via predict().
     uses_prompt = False
     exposes_tokens = False
 

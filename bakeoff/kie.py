@@ -5,9 +5,10 @@ For each page: build a field-list prompt from the gold, ask the model for a JSON
 object {field_id: value|null}, and score by DIRECT field match (no markdown
 alignment). Keeps the empty-fidelity test (blank field -> null).
 
-VLM-only: pipeline parsers (uses_prompt=false) ignore prompts and can't do
-targeted extraction, so they're not eligible. Writes runs/<model>__kie/ and
-scores/<model>__kie.json. Runs + scores in one pass.
+VLM-only: pipeline parsers (uses_prompt=false) are prompt-driven but only via a
+closed, auto-selected task vocabulary (no free-text hook), so they can't take a
+field-list instruction. Writes runs/<model>__kie/ and scores/<model>__kie.json.
+Runs + scores in one pass.
 
 Usage: python bakeoff/kie.py --model qwen25vl
 """
@@ -100,8 +101,8 @@ def main() -> int:
         sys.exit(f"kie: unknown model '{args.model}'")
     m = cfg["models"][args.model]
     if not (m.get("uses_prompt") and m.get("accepts") == "images"):
-        sys.exit(f"kie: '{args.model}' is not a prompt-using image VLM — "
-                 "Track B excludes pipeline parsers")
+        sys.exit(f"kie: '{args.model}' has no free-text prompt hook (closed task "
+                 "vocabulary) — Track B needs an instruction-following image VLM")
 
     adapter = importlib.import_module(f"models.{m['adapter']}").build(m)
     print(f"[kie:{args.model}] loading model…", flush=True)

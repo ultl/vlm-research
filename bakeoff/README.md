@@ -54,8 +54,10 @@ report.py   scores/ -> scorecard                  (CPU)
 A second task: instead of transcribing the page, ask the model to **extract the
 gold fields directly as JSON** (`{field_id: value|null}`), scored by exact field
 match — no markdown alignment, so a correct value can't be lost to layout. Keeps
-the empty-fidelity test (blank → `null`). Pipeline parsers are excluded (they
-ignore prompts).
+the empty-fidelity test (blank → `null`). Pipeline parsers are excluded: they're
+prompt-*driven* but only via a closed, auto-selected task vocabulary (e.g.
+PaddleOCR-VL's `OCR:` / `Table Recognition:`), with no free-text hook to pass a
+field list — so they can't do instruction-following KIE.
 ```sh
 CUDA_VISIBLE_DEVICES=<free> python bakeoff/kie.py --model internvl3   # or qwen25vl / deepseek_ocr
 # -> runs/<model>__kie/pageN.json + scores/<model>__kie.json
