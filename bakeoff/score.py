@@ -114,13 +114,78 @@ def extract_value(line: str, cell: dict) -> Optional[int]:
     return max(cands, key=lambda n: (len(str(n)), n))  # amounts are the big number
 
 
+# ---------- table-aware alignment (markdown + HTML grids) ----------
+
+def parse_tables(md: str) -> List[List[List[str]]]:
+    """Parse markdown pipe-tables and HTML <table>s into grids (rows of cells)."""
+    tables: List[List[List[str]]] = []
+    cur: List[List[str]] = []
+    for ln in md.splitlines():
+        s = ln.strip()
+        if s.startswith("|") and s.count("|") >= 2:
+            cells = [c.strip() for c in s.strip("|").split("|")]
+            if all(set(c) <= set("-: ") for c in cells if c):  # separator row
+                continue
+            cur.append(cells)
+        elif cur:
+            tables.append(cur)
+            cur = []
+    if cur:
+        tables.append(cur)
+    for tbl in re.findall(r"<table[^>]*>(.*?)</table>", md, re.DOTALL | re.IGNORECASE):
+        rows = []
+        for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", tbl, re.DOTALL | re.IGNORECASE):
+            cells = [re.sub(r"<[^>]+>", "", c).strip()
+                     for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", tr,
+                                         re.DOTALL | re.IGNORECASE)]
+            if cells:
+                rows.append(cells)
+        if rows:
+            tables.append(rows)
+    return tables
+
+
+def table_extract(tables, cell) -> Optional[int]:
+    """Locate the field's label/no cell, then read a number from the same row
+    (other columns) or the same column (next rows)."""
+    label = norm_text(cell["label"]) if cell.get("label") else None
+    no_int = to_int(str(cell["no"])) if cell.get("no") else None
+    for tbl in tables:
+        for r, row in enumerate(tbl):
+            for c, val in enumerate(row):
+                nv = norm_text(val)
+                hit = (label and len(label) >= 2 and label in nv) or \
+                      (no_int is not None and no_int in line_numbers(val)
+                       and any(ch.isalpha() or ord(ch) > 0x3000 for ch in val))
+                if not hit:
+                    continue
+                cands = []
+                for cc, other in enumerate(row):                # same row
+                    if cc != c:
+                        cands += [n for n in line_numbers(other) if n != no_int]
+                for rr in range(r + 1, min(r + 3, len(tbl))):    # same column
+                    if c < len(tbl[rr]):
+                        cands += [n for n in line_numbers(tbl[rr][c]) if n != no_int]
+                if cands:
+                    return max(cands, key=lambda n: (len(str(n)), n))
+    return None
+
+
 # ---------- scoring ----------
 
 def score_page(md: str, cells: List[dict]) -> dict:
     lines = [ln for ln in md.splitlines() if ln.strip()]
+    tables = parse_tables(md)
     text_nums = set()
     for ln in lines:
         text_nums.update(n for n in line_numbers(ln) if n >= 10)
+
+    def extract(c):
+        v = table_extract(tables, c)              # table grid first
+        if v is not None:
+            return v
+        anchor = find_anchor_line(lines, c)        # then plain-line fallback
+        return extract_value(anchor, c) if anchor else None
 
     rows = []
     for c in cells:
@@ -129,23 +194,15 @@ def score_page(md: str, cells: List[dict]) -> dict:
             continue
         rec = {"label": c["label"], "no": c.get("no"), "bucket": b,
                "gold": c["value"]}
-        anchor = find_anchor_line(lines, c)
+        ext = extract(c)
         if b in ("gold", "candidate"):
             gold_int = to_int(c["value"])
-            ext = extract_value(anchor, c) if anchor else None
-            if ext is None:
-                rec["verdict"] = "missed"
-            elif ext == gold_int:
-                rec["verdict"] = "correct"
-            else:
-                rec["verdict"] = "wrong"
+            rec["verdict"] = ("missed" if ext is None else
+                              "correct" if ext == gold_int else "wrong")
             rec["extracted"] = ext
             rec["present_anywhere"] = gold_int in text_nums
         elif b == "gold_empty":
-            if anchor and extract_value(anchor, c) is not None:
-                rec["verdict"] = "hallucinated"
-            else:
-                rec["verdict"] = "clean"
+            rec["verdict"] = "hallucinated" if ext is not None else "clean"
         rows.append(rec)
     return {"rows": rows, "text_nums": text_nums}
 
