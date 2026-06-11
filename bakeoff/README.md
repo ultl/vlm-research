@@ -146,6 +146,8 @@ Scoring is env-agnostic, so `report.py` merges results across all of them at the
 | both GPUs used, or the wrong one | default device pick (`device_map="auto"` spans all) | prefix the command with `CUDA_VISIBLE_DEVICES=N` |
 | `score: no run found for '<model>'` | scoring where no `runs/<model>/` exists | run first (GPU box), then score there, or `scp -r …/runs/<model> ./runs/` |
 | run errored but others still ran | per-page error capture (by design) | `python bakeoff/score.py` skips it; read `runs/<model>/page1.meta.json` → `.error` |
+| `pip … SSL: CERTIFICATE_VERIFY_FAILED` in a conda/micromamba env | env's CA bundle can't verify the host (esp. the Paddle CDN) | `micromamba install ca-certificates certifi`; or `--trusted-host <host>` for a known index |
+| `pip install -U X` says "already satisfied" but X is old | the index fetch **failed** (SSL/network), so pip saw **no newer candidate** — not that you're current | fix the SSL/network first (row above); only then can `-U` see and pull the newer version |
 
 ## Adding a model
 Add a `models/<name>.py` exposing `build(model_cfg) -> Adapter`, a stanza in
