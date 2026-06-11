@@ -67,6 +67,25 @@ Track A (`run.py`/`score.py`) = "parse the whole document," all 5 models. Track 
 (`kie.py`) = "pull the specific fields," the 3 prompt-VLMs. Different questions;
 report them separately, don't conflate.
 
+## Track B-RAG — PP-ChatOCRv4Doc (RAG-KIE, local LLM)
+Paddle's KIE pipeline: parse (PP-Structure + PP-DocBee2) → vector-index → ask an
+LLM for the gold keys → `{key: value}`, scored by direct match. The one parser-
+family path that does field extraction. **PII-safe**: point it at a LOCAL
+OpenAI-compatible LLM (its endpoint is yours — nothing goes to Baidu cloud).
+```sh
+# 1. stand up a local LLM (OpenAI-compatible), e.g.:
+vllm serve <model> --port 8000
+# 2. point chatocr at it (operator-local — never commit the key):
+export CHATOCR_LLM_BASE_URL=http://127.0.0.1:8000/v1
+export CHATOCR_LLM_API_KEY=EMPTY
+export CHATOCR_LLM_MODEL=<served-model-name>
+# 3. run (in the paddle env):
+python bakeoff/chatocr.py   # -> runs/pp_chatocrv4/chat_res.json + scores/pp_chatocrv4.json
+```
+Architecturally a **compound RAG system** (parse + retrieve + LLM reason), vs the
+single-VLM KIE of `kie.py` — that contrast is the point. `VERIFY-ON-VM`: the
+PPChatOCRv4Doc API + result keys vary by paddleocr release.
+
 ## Data (PII — repo is PRIVATE)
 This repo holds a real tax return (PII); keep it **private**. `fixtures/` (gold +
 page images) is tracked here. The raw `sample.pdf` is gitignored — `render.py`
