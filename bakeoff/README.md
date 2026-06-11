@@ -117,7 +117,7 @@ bakeoff/run_native.sh deepseek_ocr
 
 # PaddleOCR-VL — Paddle stack (cu118 wheel; no cu121 build exists)
 micromamba create -n paddle python=3.11 -c conda-forge && micromamba activate paddle
-pip install paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+pip install -U paddlepaddle-gpu -i https://www.paddlepaddle.org.cn/packages/stable/cu118/   # VL-1.6 needs a recent paddle (fused_rms_norm_ext)
 pip install -U paddleocr "paddlex[ocr]"   # PaddleOCRVL class (>=3.6) + PaddleX ocr extra
 python -c "from paddleocr import PaddleOCRVL"   # sanity-check the import
 bakeoff/run_native.sh paddleocr_vl
