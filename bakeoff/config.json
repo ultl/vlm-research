@@ -47,6 +47,13 @@
       "accepts": "pdf",
       "uses_prompt": false,
       "exposes_tokens": false
+    },
+    "pp_structurev3": {
+      "adapter": "pp_structurev3",
+      "model_id": "PaddlePaddle/PP-StructureV3",
+      "accepts": "pdf",
+      "uses_prompt": false,
+      "exposes_tokens": false
     }
   }
 }

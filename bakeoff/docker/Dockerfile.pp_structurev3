@@ -1,0 +1,26 @@
+# PP-StructureV3 image — same Paddle stack as paddleocr_vl (shared requirements).
+# Modular pipeline; sub-models (PP-OCRv5/layout/table/formula…) download on first run.
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    HF_HOME=/hf_cache
+
+# VM blocks port 80: https apt mirrors; drop unused CUDA apt repos. libgl for opencv.
+RUN rm -f /etc/apt/sources.list.d/cuda*.list /etc/apt/sources.list.d/nvidia*.list && \
+    sed -i 's|http://archive.ubuntu.com|https://archive.ubuntu.com|g; s|http://security.ubuntu.com|https://security.ubuntu.com|g' /etc/apt/sources.list && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        python3 python3-pip git libgl1 libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY bakeoff/envs/requirements-paddleocr_vl.txt /tmp/req.txt
+RUN pip3 install --no-cache-dir "paddlepaddle-gpu>=3.2.0" \
+        -i https://www.paddlepaddle.org.cn/packages/stable/cu118/ && \
+    pip3 install --no-cache-dir -r /tmp/req.txt
+
+COPY bakeoff /app/bakeoff
+
+ENTRYPOINT ["python3", "/app/bakeoff/run.py"]
+CMD ["--model", "pp_structurev3"]

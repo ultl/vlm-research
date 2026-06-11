@@ -24,7 +24,7 @@ python bakeoff/report.py
 That covers the two transformers VLMs. The other three need their own env (see
 "Running without Docker" below) or Docker. See "Gotchas" if anything errors.
 
-## Models (5)
+## Models (6)
 | Key | Model | Size | Path | Notes |
 |---|---|---|---|---|
 | `qwen25vl` | Qwen2.5-VL-7B | 7B | images | VRAM ceiling (~16–20 GB) |
@@ -32,6 +32,7 @@ That covers the two transformers VLMs. The other three need their own env (see
 | `deepseek_ocr` | DeepSeek-OCR | ~3B | images | optical compression; transformers 4.46 pin |
 | `mineru` | MinerU2.5 | 1.2B | pdf | pipeline parser; `*VERIFY-ON-VM*` CLI |
 | `paddleocr_vl` | PaddleOCR-VL | 0.9B | pdf | Paddle stack; `*VERIFY-ON-VM*` pipeline |
+| `pp_structurev3` | PP-StructureV3 | pipeline | pdf | pre-VLM modular-CV baseline; **same Paddle env** as paddleocr_vl |
 
 Each runs in its own Docker image (incompatible dep stacks). `VERIFY-ON-VM` marks
 model-specific calls (CLI flags / API) whose exact form may need a tweak on first
@@ -140,6 +141,7 @@ pip install -U paddlepaddle-gpu -i https://www.paddlepaddle.org.cn/packages/stab
 pip install -U paddleocr "paddlex[ocr]"   # PaddleOCRVL class (>=3.6) + PaddleX ocr extra
 python -c "from paddleocr import PaddleOCRVL"   # sanity-check the import
 bakeoff/run_native.sh paddleocr_vl
+bakeoff/run_native.sh pp_structurev3   # PP-StructureV3 runs in this SAME paddle env
 
 # MinerU — its own pinned stack
 micromamba create -n mineru python=3.11 -c conda-forge && micromamba activate mineru
