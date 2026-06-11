@@ -117,7 +117,10 @@ bakeoff/run_native.sh deepseek_ocr
 
 # PaddleOCR-VL — Paddle stack (cu118 wheel; no cu121 build exists)
 micromamba create -n paddle python=3.11 -c conda-forge && micromamba activate paddle
-pip install -U paddlepaddle-gpu -i https://www.paddlepaddle.org.cn/packages/stable/cu118/   # VL-1.6 needs a recent paddle (fused_rms_norm_ext)
+# VL-1.6 needs a recent paddle (fused_rms_norm_ext); --trusted-host avoids the Paddle CDN cert issue
+pip install -U paddlepaddle-gpu -i https://www.paddlepaddle.org.cn/packages/stable/cu118/ --trusted-host www.paddlepaddle.org.cn
+#   (if stable has nothing newer than 3.0.0, use .../packages/nightly/cu118/ with --pre)
+# NOTE: for paddleocr_vl, Docker is usually less pain than this native dance — no shared torch to reuse.
 pip install -U paddleocr "paddlex[ocr]"   # PaddleOCRVL class (>=3.6) + PaddleX ocr extra
 python -c "from paddleocr import PaddleOCRVL"   # sanity-check the import
 bakeoff/run_native.sh paddleocr_vl
