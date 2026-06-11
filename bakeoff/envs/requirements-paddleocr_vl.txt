@@ -2,3 +2,4 @@
 # Needs the version that exposes the `PaddleOCRVL` class (>=3.6 ships VL-1.6);
 # 3.2.0 predates it -> ImportError. VERIFY-ON-VM: pin exact once confirmed.
 paddleocr>=3.6.0
+paddlex[ocr]            # PaddleOCR-VL-1.6 needs PaddleX's ocr extra (model deps)
