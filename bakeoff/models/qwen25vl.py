@@ -32,20 +32,27 @@ class Qwen25VLAdapter(Adapter):
         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
             self.model_id, torch_dtype="auto", device_map="auto")
         self.model.eval()
-        # min/max pixels left at processor defaults; a dense scan benefits from
-        # high resolution — revisit per-model if needed.
-        self.processor = AutoProcessor.from_pretrained(self.model_id)
+        # Cap resolution: an uncapped 3510x2482 scan explodes vision tokens and
+        # OOMs host RAM during preprocessing. max_pixels bounds it (tunable).
+        kw = {}
+        if self.decode.get("min_pixels"):
+            kw["min_pixels"] = int(self.decode["min_pixels"])
+        if self.decode.get("max_pixels"):
+            kw["max_pixels"] = int(self.decode["max_pixels"])
+        self.processor = AutoProcessor.from_pretrained(self.model_id, **kw)
 
     def infer(self, image_path: str, prompt: str) -> InferResult:
         import torch
         from qwen_vl_utils import process_vision_info
 
+        image_item = {"type": "image", "image": f"file://{image_path}"}
+        if self.decode.get("min_pixels"):
+            image_item["min_pixels"] = int(self.decode["min_pixels"])
+        if self.decode.get("max_pixels"):
+            image_item["max_pixels"] = int(self.decode["max_pixels"])
         messages = [{
             "role": "user",
-            "content": [
-                {"type": "image", "image": f"file://{image_path}"},
-                {"type": "text", "text": prompt},
-            ],
+            "content": [image_item, {"type": "text", "text": prompt}],
         }]
         text = self.processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True)
