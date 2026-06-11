@@ -59,6 +59,7 @@ def flatten_gold(cells: dict) -> List[dict]:
         if isinstance(o, dict):
             if "status" in o and ("value" in o or "label_ja" in o or "category" in o):
                 out.append({
+                    "id": o.get("id"),
                     "label": o.get("label_ja") or o.get("category"),
                     "no": o.get("no"),
                     "value": o.get("value"),

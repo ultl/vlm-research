@@ -50,6 +50,20 @@ report.py   scores/ -> scorecard                  (CPU)
 - `pageN.meta.json` — latency, tokens, image hash, decode params, status
 - `run.json` — provenance: model + image digest + code SHA + prompt + pdf hash
 
+## Track B — field extraction (KIE), VLM-only
+A second task: instead of transcribing the page, ask the model to **extract the
+gold fields directly as JSON** (`{field_id: value|null}`), scored by exact field
+match — no markdown alignment, so a correct value can't be lost to layout. Keeps
+the empty-fidelity test (blank → `null`). Pipeline parsers are excluded (they
+ignore prompts).
+```sh
+CUDA_VISIBLE_DEVICES=<free> python bakeoff/kie.py --model internvl3   # or qwen25vl / deepseek_ocr
+# -> runs/<model>__kie/pageN.json + scores/<model>__kie.json
+```
+Track A (`run.py`/`score.py`) = "parse the whole document," all 5 models. Track B
+(`kie.py`) = "pull the specific fields," the 3 prompt-VLMs. Different questions;
+report them separately, don't conflate.
+
 ## Data (PII — repo is PRIVATE)
 This repo holds a real tax return (PII); keep it **private**. `fixtures/` (gold +
 page images) is tracked here. The raw `sample.pdf` is gitignored — `render.py`
