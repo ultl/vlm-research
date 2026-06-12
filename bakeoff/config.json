@@ -61,7 +61,17 @@
       "accepts": "images",
       "uses_prompt": true,
       "exposes_tokens": true,
+      "prompt_path": "bakeoff/prompts/qwen3vl-tax-markdown-v1.txt",
       "decode": { "temperature": 0.0, "max_new_tokens": 2048, "seed": 0, "min_pixels": 200704, "max_pixels": 1003520 }
+    },
+    "chandra_ocr_2": {
+      "adapter": "chandra_ocr_2",
+      "model_id": "datalab-to/chandra-ocr-2",
+      "accepts": "images",
+      "uses_prompt": false,
+      "exposes_tokens": false,
+      "method": "hf",
+      "prompt_type": "ocr_layout"
     }
   }
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build, run, and score each VLM in turn, then emit the scorecard.
+# Build, run, and score selected VLMs in turn, then emit the scorecard.
 #
 # Sequential by design: one container at a time, so each model gets the whole
 # GPU (safe on a constrained card). Default order is smallest-VRAM-first, so the
@@ -7,7 +7,7 @@
 # <20 GB GPU). A model that fails is logged and skipped — the rest still run.
 #
 # Usage:
-#   bakeoff/run_all.sh                       # all five, smallest first
+#   bakeoff/run_all.sh                       # default subset, smallest first
 #   bakeoff/run_all.sh paddleocr_vl mineru   # only these, in this order
 #
 # Run from anywhere; it cds to the repo root itself.

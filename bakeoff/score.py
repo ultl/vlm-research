@@ -17,6 +17,8 @@ import unicodedata
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from page_selection import resolve_page_names
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -250,9 +252,18 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Score a model run against gold")
     ap.add_argument("--config", default=str(ROOT / "bakeoff" / "config.json"))
     ap.add_argument("--model", required=True)
+    ap.add_argument(
+        "--pages",
+        nargs="+",
+        help="page names to score, e.g. page1 page3 or page1,page3",
+    )
     args = ap.parse_args()
 
     cfg = json.loads(Path(args.config).read_text())
+    try:
+        page_names = resolve_page_names(cfg["pages"], args.pages)
+    except ValueError as exc:
+        sys.exit(f"score: {exc}")
     gold_dir = ROOT / cfg["paths"]["gold"]
     run_dir = ROOT / cfg["paths"]["runs"] / args.model
     if not run_dir.exists():
@@ -263,7 +274,7 @@ def main() -> int:
     gold_values: set = set()
     per_page = {}
 
-    for name in cfg["pages"]:
+    for name in page_names:
         gold_path = gold_dir / f"{name}.cells.json"
         md_path = run_dir / f"{name}.md"
         if not gold_path.exists():
@@ -286,7 +297,7 @@ def main() -> int:
         per_page[name] = page["rows"]
 
     agg = aggregate(all_rows, text_nums_all, gold_values)
-    result = {"model": args.model, "metrics": agg,
+    result = {"model": args.model, "pages": page_names, "metrics": agg,
               "fields": all_rows,
               "unmatched": [r for r in all_rows if r.get("verdict") == "missed"]}
 

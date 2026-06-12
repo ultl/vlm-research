@@ -21,13 +21,15 @@ ls sample.pdf || echo "scp sample.pdf to the repo root first"
 CUDA_VISIBLE_DEVICES=0 bakeoff/run_native.sh internvl3 qwen25vl
 python bakeoff/report.py
 ```
-That covers the two transformers VLMs. The other three need their own env (see
-"Running without Docker" below) or Docker. See "Gotchas" if anything errors.
+That covers the shared transformers VLM stack. The other dependency stacks need
+their own env (see "Running without Docker" below) or Docker. See "Gotchas" if
+anything errors.
 
-## Models (7)
+## Models (8)
 | Key | Model | Size | Path | Notes |
 |---|---|---|---|---|
 | `qwen3vl` | Qwen3-VL-8B-Instruct | 8B | images | generational upgrade to qwen25vl; newer transformers |
+| `chandra_ocr_2` | Chandra OCR 2 | 5.3B | images | document OCR/layout model; markdown output; Chandra package |
 | `qwen25vl` | Qwen2.5-VL-7B | 7B | images | VRAM ceiling (~16–20 GB) |
 | `internvl3` | InternVL3-2B | 2B | images | dynamic tiling (`max_tiles`) |
 | `deepseek_ocr` | DeepSeek-OCR | ~3B | images | optical compression; transformers 4.46 pin |
@@ -52,6 +54,28 @@ report.py   scores/ -> scorecard                  (CPU)
 - `pageN.meta.json` — latency, tokens, image hash, decode params, status
 - `run.json` — provenance: model + image digest + code SHA + prompt + pdf hash
 
+## Prompts
+- Shared default: `bakeoff/prompt.txt`.
+- Model-specific override: set `prompt_path` in that model's `config.json` stanza.
+- `qwen3vl` uses `bakeoff/prompts/qwen3vl-tax-markdown-v1.txt` so prompt experiments do not affect other models.
+
+## Page selection
+- Default pages live in `bakeoff/config.json` under `pages`.
+- Per-run override:
+  ```sh
+  python bakeoff/run.py --model qwen3vl --pages page2
+  python bakeoff/score.py --model qwen3vl --pages page2
+  ```
+- Multiple pages:
+  ```sh
+  python bakeoff/run.py --model qwen3vl --pages page1 page3
+  # or: --pages page1,page3
+  ```
+- Both-track helper:
+  ```sh
+  CUDA_VISIBLE_DEVICES=1 bakeoff/run_both.sh qwen3vl page2
+  ```
+
 ## Track B — field extraction (KIE), VLM-only
 A second task: instead of transcribing the page, ask the model to **extract the
 gold fields directly as JSON** (`{field_id: value|null}`), scored by exact field
@@ -64,8 +88,8 @@ field list — so they can't do instruction-following KIE.
 CUDA_VISIBLE_DEVICES=<free> python bakeoff/kie.py --model internvl3   # or qwen25vl / deepseek_ocr
 # -> runs/<model>__kie/pageN.json + scores/<model>__kie.json
 ```
-Track A (`run.py`/`score.py`) = "parse the whole document," all 5 models. Track B
-(`kie.py`) = "pull the specific fields," the 3 prompt-VLMs. Different questions;
+Track A (`run.py`/`score.py`) = "parse the whole document." Track B
+(`kie.py`) = "pull the specific fields," for free-text prompt VLMs. Different questions;
 report them separately, don't conflate.
 
 ## Track B-RAG — PP-ChatOCRv4Doc (RAG-KIE, local LLM)
@@ -163,6 +187,12 @@ pip install -U paddleocr "paddlex[ocr]"   # PaddleOCRVL class (>=3.6) + PaddleX 
 python -c "from paddleocr import PaddleOCRVL"   # sanity-check the import
 bakeoff/run_native.sh paddleocr_vl
 bakeoff/run_native.sh pp_structurev3   # PP-StructureV3 runs in this SAME paddle env
+
+# Chandra OCR 2 — document OCR/layout stack
+micromamba create -n chandra python=3.11 -c conda-forge && micromamba activate chandra
+pip install torch torchvision
+pip install -r bakeoff/envs/requirements-chandra_ocr_2.txt
+bakeoff/run_native.sh chandra_ocr_2
 
 # MinerU — its own pinned stack
 micromamba create -n mineru python=3.11 -c conda-forge && micromamba activate mineru

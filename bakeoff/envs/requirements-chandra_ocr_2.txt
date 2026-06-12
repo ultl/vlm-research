@@ -1,0 +1,5 @@
+# Chandra package owns the OCR/layout inference wrapper and the matching
+# transformers stack for datalab-to/chandra-ocr-2. torch is installed separately
+# in the Dockerfile for CUDA builds; native users can reuse their existing torch.
+chandra-ocr[hf]
+pillow==11.0.0

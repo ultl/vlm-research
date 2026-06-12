@@ -24,6 +24,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from page_selection import resolve_page_names
 from score import to_int, flatten_gold, bucket  # reuse normalization + bucketing
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -94,9 +95,18 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Track B: field-extraction (KIE)")
     ap.add_argument("--config", default=str(ROOT / "bakeoff" / "config.json"))
     ap.add_argument("--model", required=True)
+    ap.add_argument(
+        "--pages",
+        nargs="+",
+        help="page names to run, e.g. page1 page3 or page1,page3",
+    )
     args = ap.parse_args()
 
     cfg = json.loads(Path(args.config).read_text())
+    try:
+        page_names = resolve_page_names(cfg["pages"], args.pages)
+    except ValueError as exc:
+        sys.exit(f"kie: {exc}")
     if args.model not in cfg["models"]:
         sys.exit(f"kie: unknown model '{args.model}'")
     m = cfg["models"][args.model]
@@ -114,7 +124,7 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     all_rows = []
-    for name in cfg["pages"]:
+    for name in page_names:
         cells = flatten_gold(json.loads((gold_dir / f"{name}.cells.json").read_text()))
         fields = page_fields(cells)
         prompt = build_prompt(fields)
@@ -145,7 +155,13 @@ def main() -> int:
         "empty_n": len(empt),
         "hallucinated": sum(1 for r in empt if r["verdict"] == "hallucinated"),
     }
-    result = {"model": args.model, "task": "kie", "metrics": metrics, "fields": all_rows}
+    result = {
+        "model": args.model,
+        "task": "kie",
+        "pages": page_names,
+        "metrics": metrics,
+        "fields": all_rows,
+    }
     sdir = ROOT / cfg["paths"]["scores"]
     sdir.mkdir(parents=True, exist_ok=True)
     (sdir / f"{args.model}__kie.json").write_text(

@@ -1,0 +1,4 @@
+Extract all fields and their values in this document. The fields include:
+Income: Address, Name, Phone number, Sales Amount, Household Consumption Amount, Miscellaneous Income, Subtotal (①+②+③) ④  , Inventory of Agricultural Products, Beginning of Period ⑤ , Ending of Period ⑥ , Total (④-⑤+⑥) ⑦ .
+Expense: Taxes and Public Charges ⑧ , Seedling Costs ⑨, Livestock Costs ⑩ , Fertilizer Costs ⑪ , Feed Costs ⑫ , Farm Tools Costs ⑬ , Agricultural Hygiene Costs ⑭, Miscellaneous Materials Costs ⑮ ,  Repair Costs ⑯ , Power and Utilities Costs ⑰ , Work Clothes Costs ⑱ , Pesticide Insurance Premiums ⑲ , Depreciation Costs ⑳ , Packing and Sorting Fees ㉑ , Employee Costs ㉒ , Interest and Discount Charges 23, Rent/Lease Fees 24, Land Improvement Expenses 25, Miscellaneous Expenses 26, Subtotal 27.
+If the answer is not present, respond only with 'NULL'. No explanation. No punctuation. No extra words.

@@ -49,6 +49,7 @@ def main() -> int:
     for f in files:
         d = json.loads(f.read_text())
         m, model = d["metrics"], d["model"]
+        pages = d.get("pages", cfg["pages"])
         if "field_gold" in m:                                  # Track A (parse)
             rows.append([
                 model, "A:parse",
@@ -56,7 +57,7 @@ def main() -> int:
                 _r(m["empty_fidelity"]["clean_rate"]),
                 _r(m["empty_fidelity"]["hallucination_rate"]),
                 _r(m["value_recall"]["recall"]),
-                _r(latency_stats(runs_dir / model, cfg["pages"])),
+                _r(latency_stats(runs_dir / model, pages)),
             ])
         else:                                                  # Track B (kie / rag)
             task = d.get("task", "kie")
@@ -66,7 +67,7 @@ def main() -> int:
                 model, "B:kie" if task == "kie" else "B:rag",
                 _r(m.get("field_accuracy")), "-",
                 _r(m.get("empty_clean_rate")), _r(halluc), "-",
-                _r(m.get("latency_s") or latency_stats(runs_dir / f"{model}__kie", cfg["pages"])),
+                _r(m.get("latency_s") or latency_stats(runs_dir / f"{model}__kie", pages)),
             ])
 
     rows.sort(key=lambda r: (r[0], r[1]))

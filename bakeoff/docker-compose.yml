@@ -162,5 +162,28 @@ services:
               count: all
               capabilities: [gpu]
 
+  chandra_ocr_2:
+    build:
+      context: ..
+      dockerfile: bakeoff/docker/Dockerfile.chandra_ocr_2
+    image: vlm-bakeoff/chandra_ocr_2
+    command: ["--model", "chandra_ocr_2"]
+    environment:
+      HF_HOME: /hf_cache
+      BAKEOFF_IMAGE_DIGEST: "${BAKEOFF_IMAGE_DIGEST:-local}"
+      BAKEOFF_CODE_SHA: "${BAKEOFF_CODE_SHA:-}"
+    volumes:
+      - ../fixtures:/app/fixtures:ro
+      - ../sample.pdf:/app/sample.pdf:ro
+      - ../runs:/app/runs
+      - hf_cache:/hf_cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
 volumes:
   hf_cache:
