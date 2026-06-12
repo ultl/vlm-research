@@ -1,0 +1,26 @@
+# Qwen3-VL-8B inference image. Weights pulled from HF into the mounted cache.
+# Newer transformers than qwen25vl (Qwen3-VL class). Own image to isolate it.
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    HF_HOME=/hf_cache
+
+# VM blocks port 80: https apt mirrors; drop unused CUDA apt repos.
+RUN rm -f /etc/apt/sources.list.d/cuda*.list /etc/apt/sources.list.d/nvidia*.list && \
+    sed -i 's|http://archive.ubuntu.com|https://archive.ubuntu.com|g; s|http://security.ubuntu.com|https://security.ubuntu.com|g' /etc/apt/sources.list && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        python3 python3-pip git && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY bakeoff/envs/requirements-qwen3vl.txt /tmp/req.txt
+RUN pip3 install --no-cache-dir torch==2.5.1 \
+        --index-url https://download.pytorch.org/whl/cu121 && \
+    pip3 install --no-cache-dir -r /tmp/req.txt
+
+COPY bakeoff /app/bakeoff
+
+ENTRYPOINT ["python3", "/app/bakeoff/run.py"]
+CMD ["--model", "qwen3vl"]

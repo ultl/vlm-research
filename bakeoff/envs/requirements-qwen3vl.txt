@@ -1,0 +1,7 @@
+# Qwen3-VL needs a newer transformers than Qwen2.5-VL (the Qwen3VL class was
+# added later). torch installed separately in the Dockerfile (CUDA index).
+# VERIFY-ON-VM: bump transformers if the Qwen3-VL class isn't found.
+transformers>=4.57.0
+accelerate==1.2.1
+qwen-vl-utils==0.0.8
+pillow==11.0.0

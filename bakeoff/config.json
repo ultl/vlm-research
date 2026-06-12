@@ -54,6 +54,14 @@
       "accepts": "pdf",
       "uses_prompt": false,
       "exposes_tokens": false
+    },
+    "qwen3vl": {
+      "adapter": "qwen3vl",
+      "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+      "accepts": "images",
+      "uses_prompt": true,
+      "exposes_tokens": true,
+      "decode": { "temperature": 0.0, "max_new_tokens": 2048, "seed": 0, "min_pixels": 200704, "max_pixels": 1003520 }
     }
   }
 }

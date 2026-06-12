@@ -24,9 +24,10 @@ python bakeoff/report.py
 That covers the two transformers VLMs. The other three need their own env (see
 "Running without Docker" below) or Docker. See "Gotchas" if anything errors.
 
-## Models (6)
+## Models (7)
 | Key | Model | Size | Path | Notes |
 |---|---|---|---|---|
+| `qwen3vl` | Qwen3-VL-8B-Instruct | 8B | images | generational upgrade to qwen25vl; newer transformers |
 | `qwen25vl` | Qwen2.5-VL-7B | 7B | images | VRAM ceiling (~16–20 GB) |
 | `internvl3` | InternVL3-2B | 2B | images | dynamic tiling (`max_tiles`) |
 | `deepseek_ocr` | DeepSeek-OCR | ~3B | images | optical compression; transformers 4.46 pin |
