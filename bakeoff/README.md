@@ -137,6 +137,7 @@ download):
 micromamba activate <env>
 bakeoff/run_native.sh                 # internvl3 + qwen25vl (shared transformers stack)
 bakeoff/run_native.sh internvl3       # just one
+bakeoff/run_both.sh qwen3vl           # ONE VLM through BOTH tracks (parse + kie) + scorecard
 ```
 The five models split into **conflicting stacks**, so one env can't hold all.
 Make a per-model env for the others (lighter than Docker, you manage the envs):
