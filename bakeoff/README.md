@@ -195,8 +195,9 @@ bakeoff/run_native.sh pp_structurev3   # PP-StructureV3 runs in this SAME paddle
 
 # Chandra OCR 2 — document OCR/layout stack
 micromamba create -n chandra python=3.11 -c conda-forge && micromamba activate chandra
-python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
 python -m pip install -r bakeoff/envs/requirements-chandra_ocr_2.txt
+python -m pip uninstall -y torch torchvision torchaudio
+python -m pip install --force-reinstall torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
 python - <<'PY'
 import torch
 print("torch", torch.__version__)
@@ -224,6 +225,8 @@ Scoring is env-agnostic, so `report.py` merges results across all of them at the
 |---|---|---|
 | `No matching distribution found for torch==2.5.1` | Python 3.13/3.14 (no wheels) or wrong arch | use Python **3.11** |
 | `torch.cuda.is_available()` is `False` for Chandra | active env has CPU-only PyTorch, hidden GPUs, or is running on a non-GPU/login node | install a CUDA PyTorch wheel in the active env; verify with the Chandra setup snippet above before running |
+| `NVIDIA driver ... too old` with `torch ... +cu130` | PyTorch CUDA wheel is newer than the machine driver API (e.g. driver API 12.4 cannot run a CUDA 13.0 wheel) | reinstall PyTorch with a CUDA wheel matching the driver API, e.g. `cu124` for driver API `12040` |
+| `undefined symbol: ncclCommResume` from `libtorch_cuda.so` | mixed PyTorch/NCCL libraries in the env, often after installing multiple CUDA torch wheels or conda NCCL packages | recreate the env, install Chandra deps, then force-reinstall the compatible torch wheel last; check `LD_LIBRARY_PATH` is not pointing at an older NCCL |
 | `apt-get … connection timed out` in a Docker build | VM blocks outbound port 80 | already fixed — Dockerfiles use **https** apt mirrors |
 | `paddlepaddle-gpu==3.0.0` not found | Paddle ships no `cu121` wheels | already fixed — Dockerfile uses the **cu118** index |
 | weights fill the disk / very slow first run | HF cache on a small root disk | `export HF_HOME=/big/disk/hf_cache` **before** the first run |
