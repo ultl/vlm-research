@@ -48,6 +48,12 @@ def main() -> int:
     except ValueError as exc:
         sys.exit(f"run: {exc}")
 
+    print(
+        f"run: model={args.model} adapter={mcfg['adapter']} "
+        f"pages={','.join(page_names)} prompt={prompt_path}",
+        flush=True,
+    )
+
     from models.base import Runner
 
     mod = importlib.import_module(f"models.{mcfg['adapter']}")

@@ -38,10 +38,19 @@ class ChandraOCR2Adapter(Adapter):
             raise ValueError(f"unknown Chandra method: {self.method!r}")
 
     def _load_hf(self) -> None:
+        print(
+            f"[{self.name}] importing torch/transformers for HF backend...",
+            flush=True,
+        )
         import torch
         from transformers import AutoModelForImageTextToText, AutoProcessor
 
         self._cuda = torch.version.cuda
+        print(
+            f"[{self.name}] torch cuda={self._cuda}; loading weights "
+            f"for {self.model_id} with device_map=auto...",
+            flush=True,
+        )
         try:
             self.model = AutoModelForImageTextToText.from_pretrained(
                 self.model_id,
@@ -54,9 +63,11 @@ class ChandraOCR2Adapter(Adapter):
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
+        print(f"[{self.name}] model weights loaded; loading processor...", flush=True)
         self.model.eval()
         self.model.processor = AutoProcessor.from_pretrained(self.model_id)
         self.model.processor.tokenizer.padding_side = "left"
+        print(f"[{self.name}] processor loaded", flush=True)
 
     def _load_vllm(self) -> None:
         from chandra.model import InferenceManager
@@ -72,11 +83,14 @@ class ChandraOCR2Adapter(Adapter):
         return InferResult(text=text)
 
     def _infer_hf(self, image_path: str, custom_prompt: str | None) -> str:
+        print(f"[{self.name}] importing Chandra HF helpers...", flush=True)
         from chandra.model.hf import generate_hf
         from chandra.model.schema import BatchInputItem
         from chandra.output import parse_markdown
         from PIL import Image
 
+        prompt_source = "custom prompt" if custom_prompt else f"prompt_type={self.prompt_type}"
+        print(f"[{self.name}] preparing image with {prompt_source}...", flush=True)
         with Image.open(image_path) as im:
             batch = [
                 BatchInputItem(
@@ -85,6 +99,7 @@ class ChandraOCR2Adapter(Adapter):
                     prompt_type=None if custom_prompt else self.prompt_type,
                 )
             ]
+            print(f"[{self.name}] generating page output...", flush=True)
             result = generate_hf(batch, self.model)[0]
 
         raw = getattr(result, "raw", None)
