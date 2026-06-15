@@ -72,6 +72,16 @@
       "exposes_tokens": false,
       "method": "hf",
       "prompt_type": "ocr_layout"
+    },
+    "chandra_ocr_2_custom_prompt": {
+      "adapter": "chandra_ocr_2",
+      "model_id": "datalab-to/chandra-ocr-2",
+      "accepts": "images",
+      "uses_prompt": false,
+      "exposes_tokens": false,
+      "method": "hf",
+      "prompt_type": "ocr_layout",
+      "prompt_path": "bakeoff/prompts/chandra-ocr-tax-fields-v1.txt"
     }
   }
 }

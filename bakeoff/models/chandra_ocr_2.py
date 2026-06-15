@@ -1,9 +1,9 @@
 """Chandra OCR 2 adapter (Datalab document OCR, image path).
 
 Chandra is a document-specialized OCR model that emits markdown/layout output.
-Its public package exposes a higher-level `BatchInputItem` API rather than a
-plain transformers chat prompt, so this adapter ignores the shared free-text
-prompt and uses Chandra's `ocr_layout` prompt type.
+By default this adapter uses Chandra's `prompt_type` presets. A model stanza can
+also set `prompt_path`; in that case the runner-provided prompt is passed as a
+custom Chandra prompt for Track A experiments.
 """
 from __future__ import annotations
 
@@ -19,10 +19,12 @@ class ChandraOCR2Adapter(Adapter):
     exposes_tokens = False
 
     def __init__(self, model_id: str, method: str = "hf",
-                 prompt_type: str = "ocr_layout"):
+                 prompt_type: str = "ocr_layout",
+                 custom_prompt_enabled: bool = False):
         self.model_id = model_id
         self.method = method
         self.prompt_type = prompt_type
+        self.custom_prompt_enabled = custom_prompt_enabled
         self.model = None
         self.manager = None
         self._cuda = None
@@ -62,13 +64,14 @@ class ChandraOCR2Adapter(Adapter):
         self.manager = InferenceManager(method="vllm")
 
     def infer(self, image_path: str, prompt: str) -> InferResult:
+        custom_prompt = self._custom_prompt(prompt)
         if self.method == "hf":
-            text = self._infer_hf(image_path)
+            text = self._infer_hf(image_path, custom_prompt)
         else:
-            text = self._infer_vllm(image_path)
+            text = self._infer_vllm(image_path, custom_prompt)
         return InferResult(text=text)
 
-    def _infer_hf(self, image_path: str) -> str:
+    def _infer_hf(self, image_path: str, custom_prompt: str | None) -> str:
         from chandra.model.hf import generate_hf
         from chandra.model.schema import BatchInputItem
         from chandra.output import parse_markdown
@@ -78,18 +81,21 @@ class ChandraOCR2Adapter(Adapter):
             batch = [
                 BatchInputItem(
                     image=im.convert("RGB"),
-                    prompt_type=self.prompt_type,
+                    prompt=custom_prompt,
+                    prompt_type=None if custom_prompt else self.prompt_type,
                 )
             ]
             result = generate_hf(batch, self.model)[0]
 
         raw = getattr(result, "raw", None)
         if raw is not None:
+            if custom_prompt:
+                return self._as_text(raw)
             return self._as_text(parse_markdown(raw))
         markdown = getattr(result, "markdown", None)
         return self._as_text(markdown if markdown is not None else result)
 
-    def _infer_vllm(self, image_path: str) -> str:
+    def _infer_vllm(self, image_path: str, custom_prompt: str | None) -> str:
         from chandra.model.schema import BatchInputItem
         from PIL import Image
 
@@ -97,16 +103,25 @@ class ChandraOCR2Adapter(Adapter):
             batch = [
                 BatchInputItem(
                     image=im.convert("RGB"),
-                    prompt_type=self.prompt_type,
+                    prompt=custom_prompt,
+                    prompt_type=None if custom_prompt else self.prompt_type,
                 )
             ]
             result = self.manager.generate(batch)[0]
 
+        raw = getattr(result, "raw", None)
+        if custom_prompt and raw is not None:
+            return self._as_text(raw)
         markdown = getattr(result, "markdown", None)
         if markdown is not None:
             return self._as_text(markdown)
-        raw = getattr(result, "raw", None)
         return self._as_text(raw if raw is not None else result)
+
+    def _custom_prompt(self, prompt: str) -> str | None:
+        if not self.custom_prompt_enabled:
+            return None
+        prompt = prompt.strip()
+        return prompt or None
 
     @staticmethod
     def _as_text(value) -> str:
@@ -117,6 +132,7 @@ class ChandraOCR2Adapter(Adapter):
             "model_id": self.model_id,
             "method": self.method,
             "prompt_type": self.prompt_type,
+            "custom_prompt_enabled": self.custom_prompt_enabled,
             "cuda": self._cuda,
         }
         try:
@@ -144,4 +160,7 @@ def build(model_cfg: dict) -> ChandraOCR2Adapter:
         model_cfg["model_id"],
         method=model_cfg.get("method", "hf"),
         prompt_type=model_cfg.get("prompt_type", "ocr_layout"),
+        custom_prompt_enabled=bool(
+            model_cfg.get("custom_prompt") or model_cfg.get("prompt_path")
+        ),
     )

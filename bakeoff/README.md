@@ -25,11 +25,12 @@ That covers the shared transformers VLM stack. The other dependency stacks need
 their own env (see "Running without Docker" below) or Docker. See "Gotchas" if
 anything errors.
 
-## Models (8)
+## Models (9)
 | Key | Model | Size | Path | Notes |
 |---|---|---|---|---|
 | `qwen3vl` | Qwen3-VL-8B-Instruct | 8B | images | generational upgrade to qwen25vl; newer transformers |
 | `chandra_ocr_2` | Chandra OCR 2 | 5.3B | images | document OCR/layout model; markdown output; Chandra package |
+| `chandra_ocr_2_custom_prompt` | Chandra OCR 2 | 5.3B | images | same weights with Qwen3-VL-style tax field prompt |
 | `qwen25vl` | Qwen2.5-VL-7B | 7B | images | VRAM ceiling (~16–20 GB) |
 | `internvl3` | InternVL3-2B | 2B | images | dynamic tiling (`max_tiles`) |
 | `deepseek_ocr` | DeepSeek-OCR | ~3B | images | optical compression; transformers 4.46 pin |
@@ -58,6 +59,8 @@ report.py   scores/ -> scorecard                  (CPU)
 - Shared default: `bakeoff/prompt.txt`.
 - Model-specific override: set `prompt_path` in that model's `config.json` stanza.
 - `qwen3vl` uses `bakeoff/prompts/qwen3vl-tax-markdown-v1.txt` so prompt experiments do not affect other models.
+- `chandra_ocr_2` keeps Chandra's built-in `ocr_layout` prompt type as the baseline.
+- `chandra_ocr_2_custom_prompt` uses `bakeoff/prompts/chandra-ocr-tax-fields-v1.txt`, matching the Qwen3-VL field prompt style; it remains Track A only, not KIE.
 
 ## Page selection
 - Default pages live in `bakeoff/config.json` under `pages`.
