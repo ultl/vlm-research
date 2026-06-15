@@ -195,9 +195,18 @@ bakeoff/run_native.sh pp_structurev3   # PP-StructureV3 runs in this SAME paddle
 
 # Chandra OCR 2 — document OCR/layout stack
 micromamba create -n chandra python=3.11 -c conda-forge && micromamba activate chandra
-pip install torch torchvision
-pip install -r bakeoff/envs/requirements-chandra_ocr_2.txt
-bakeoff/run_native.sh chandra_ocr_2
+python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+python -m pip install -r bakeoff/envs/requirements-chandra_ocr_2.txt
+python - <<'PY'
+import torch
+print("torch", torch.__version__)
+print("torch cuda build", torch.version.cuda)
+print("cuda available", torch.cuda.is_available())
+print("device count", torch.cuda.device_count())
+if torch.cuda.is_available():
+    print("gpu", torch.cuda.get_device_name(0))
+PY
+CUDA_VISIBLE_DEVICES=0 python -u bakeoff/run.py --model chandra_ocr_2 --pages page2
 
 # MinerU — its own pinned stack
 micromamba create -n mineru python=3.11 -c conda-forge && micromamba activate mineru
@@ -213,7 +222,8 @@ Scoring is env-agnostic, so `report.py` merges results across all of them at the
 ## Gotchas (hit once, fixed — keep for next time)
 | Symptom | Cause | Fix |
 |---|---|---|
-| `No matching distribution found for torch==2.5.1` | Python 3.13/3.14 (no wheels) or wrong arch | use Python **3.11**; native install is just `pip install torch torchvision` (no `--index-url`) |
+| `No matching distribution found for torch==2.5.1` | Python 3.13/3.14 (no wheels) or wrong arch | use Python **3.11** |
+| `torch.cuda.is_available()` is `False` for Chandra | active env has CPU-only PyTorch, hidden GPUs, or is running on a non-GPU/login node | install a CUDA PyTorch wheel in the active env; verify with the Chandra setup snippet above before running |
 | `apt-get … connection timed out` in a Docker build | VM blocks outbound port 80 | already fixed — Dockerfiles use **https** apt mirrors |
 | `paddlepaddle-gpu==3.0.0` not found | Paddle ships no `cu121` wheels | already fixed — Dockerfile uses the **cu118** index |
 | weights fill the disk / very slow first run | HF cache on a small root disk | `export HF_HOME=/big/disk/hf_cache` **before** the first run |
