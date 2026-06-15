@@ -21,12 +21,14 @@ class ChandraOCR2Adapter(Adapter):
     def __init__(self, model_id: str, method: str = "hf",
                  prompt_type: str = "ocr_layout",
                  custom_prompt_enabled: bool = False,
-                 max_output_tokens: int | None = None):
+                 max_output_tokens: int | None = None,
+                 device_map: str = "cuda:0"):
         self.model_id = model_id
         self.method = method
         self.prompt_type = prompt_type
         self.custom_prompt_enabled = custom_prompt_enabled
         self.max_output_tokens = max_output_tokens
+        self.device_map = device_map
         self.model = None
         self.manager = None
         self._cuda = None
@@ -51,29 +53,44 @@ class ChandraOCR2Adapter(Adapter):
         self._cuda = torch.version.cuda
         self._cuda_available = torch.cuda.is_available()
         gpu = torch.cuda.get_device_name(0) if self._cuda_available else "none"
+        device_map = self._resolve_device_map(torch)
         print(
             f"[{self.name}] torch cuda_build={self._cuda} "
             f"cuda_available={self._cuda_available} gpu={gpu}; "
-            f"loading weights for {self.model_id} with device_map=auto...",
+            f"loading weights for {self.model_id} with device_map={device_map}...",
             flush=True,
         )
         try:
             self.model = AutoModelForImageTextToText.from_pretrained(
                 self.model_id,
                 dtype=torch.bfloat16,
-                device_map="auto",
+                device_map=device_map,
             )
         except TypeError:
             self.model = AutoModelForImageTextToText.from_pretrained(
                 self.model_id,
                 torch_dtype=torch.bfloat16,
-                device_map="auto",
+                device_map=device_map,
             )
+        loaded_map = getattr(self.model, "hf_device_map", None)
+        if loaded_map:
+            print(f"[{self.name}] loaded device map: {loaded_map}", flush=True)
         print(f"[{self.name}] model weights loaded; loading processor...", flush=True)
         self.model.eval()
         self.model.processor = AutoProcessor.from_pretrained(self.model_id)
         self.model.processor.tokenizer.padding_side = "left"
         print(f"[{self.name}] processor loaded", flush=True)
+
+    def _resolve_device_map(self, torch):
+        if self.device_map == "auto":
+            return "auto"
+        if self.device_map.startswith("cuda") and not torch.cuda.is_available():
+            raise RuntimeError(
+                "Chandra is configured for CUDA, but torch.cuda.is_available() "
+                "is False in this process. Check the active env, CUDA build, "
+                "and CUDA_VISIBLE_DEVICES."
+            )
+        return {"": self.device_map}
 
     def _load_vllm(self) -> None:
         from chandra.model import InferenceManager
@@ -166,6 +183,7 @@ class ChandraOCR2Adapter(Adapter):
             "prompt_type": self.prompt_type,
             "custom_prompt_enabled": self.custom_prompt_enabled,
             "max_output_tokens": self.max_output_tokens,
+            "device_map": self.device_map,
             "cuda": self._cuda,
             "cuda_available": self._cuda_available,
         }
@@ -200,4 +218,5 @@ def build(model_cfg: dict) -> ChandraOCR2Adapter:
             model_cfg.get("custom_prompt") or model_cfg.get("prompt_path")
         ),
         max_output_tokens=max_output_tokens,
+        device_map=model_cfg.get("device_map", "cuda:0"),
     )

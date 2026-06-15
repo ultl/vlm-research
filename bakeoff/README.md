@@ -62,6 +62,7 @@ report.py   scores/ -> scorecard                  (CPU)
 - `chandra_ocr_2` keeps Chandra's built-in `ocr_layout` prompt type as the baseline.
 - `chandra_ocr_2_custom_prompt` uses `bakeoff/prompts/chandra-ocr-tax-fields-v1.txt`, matching the Qwen3-VL field prompt style; it remains Track A only, not KIE.
 - Chandra generation is capped in `decode.max_output_tokens`; raise it if the output is truncated.
+- Chandra uses `device_map: "cuda:0"` by default, meaning the first GPU visible to the process. Use `CUDA_VISIBLE_DEVICES=N` to select the physical GPU.
 
 ## Page selection
 - Default pages live in `bakeoff/config.json` under `pages`.
