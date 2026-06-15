@@ -71,7 +71,8 @@
       "uses_prompt": false,
       "exposes_tokens": false,
       "method": "hf",
-      "prompt_type": "ocr_layout"
+      "prompt_type": "ocr_layout",
+      "decode": { "max_output_tokens": 2048 }
     },
     "chandra_ocr_2_custom_prompt": {
       "adapter": "chandra_ocr_2",
@@ -81,7 +82,8 @@
       "exposes_tokens": false,
       "method": "hf",
       "prompt_type": "ocr_layout",
-      "prompt_path": "bakeoff/prompts/chandra-ocr-tax-fields-v1.txt"
+      "prompt_path": "bakeoff/prompts/chandra-ocr-tax-fields-v1.txt",
+      "decode": { "max_output_tokens": 1024 }
     }
   }
 }

@@ -61,6 +61,7 @@ report.py   scores/ -> scorecard                  (CPU)
 - `qwen3vl` uses `bakeoff/prompts/qwen3vl-tax-markdown-v1.txt` so prompt experiments do not affect other models.
 - `chandra_ocr_2` keeps Chandra's built-in `ocr_layout` prompt type as the baseline.
 - `chandra_ocr_2_custom_prompt` uses `bakeoff/prompts/chandra-ocr-tax-fields-v1.txt`, matching the Qwen3-VL field prompt style; it remains Track A only, not KIE.
+- Chandra generation is capped in `decode.max_output_tokens`; raise it if the output is truncated.
 
 ## Page selection
 - Default pages live in `bakeoff/config.json` under `pages`.

@@ -20,14 +20,17 @@ class ChandraOCR2Adapter(Adapter):
 
     def __init__(self, model_id: str, method: str = "hf",
                  prompt_type: str = "ocr_layout",
-                 custom_prompt_enabled: bool = False):
+                 custom_prompt_enabled: bool = False,
+                 max_output_tokens: int | None = None):
         self.model_id = model_id
         self.method = method
         self.prompt_type = prompt_type
         self.custom_prompt_enabled = custom_prompt_enabled
+        self.max_output_tokens = max_output_tokens
         self.model = None
         self.manager = None
         self._cuda = None
+        self._cuda_available = None
 
     def load(self) -> None:
         if self.method == "hf":
@@ -46,9 +49,12 @@ class ChandraOCR2Adapter(Adapter):
         from transformers import AutoModelForImageTextToText, AutoProcessor
 
         self._cuda = torch.version.cuda
+        self._cuda_available = torch.cuda.is_available()
+        gpu = torch.cuda.get_device_name(0) if self._cuda_available else "none"
         print(
-            f"[{self.name}] torch cuda={self._cuda}; loading weights "
-            f"for {self.model_id} with device_map=auto...",
+            f"[{self.name}] torch cuda_build={self._cuda} "
+            f"cuda_available={self._cuda_available} gpu={gpu}; "
+            f"loading weights for {self.model_id} with device_map=auto...",
             flush=True,
         )
         try:
@@ -99,8 +105,16 @@ class ChandraOCR2Adapter(Adapter):
                     prompt_type=None if custom_prompt else self.prompt_type,
                 )
             ]
-            print(f"[{self.name}] generating page output...", flush=True)
-            result = generate_hf(batch, self.model)[0]
+            print(
+                f"[{self.name}] generating page output "
+                f"(max_output_tokens={self.max_output_tokens or 'package default'})...",
+                flush=True,
+            )
+            result = generate_hf(
+                batch,
+                self.model,
+                max_output_tokens=self.max_output_tokens,
+            )[0]
 
         raw = getattr(result, "raw", None)
         if raw is not None:
@@ -122,7 +136,10 @@ class ChandraOCR2Adapter(Adapter):
                     prompt_type=None if custom_prompt else self.prompt_type,
                 )
             ]
-            result = self.manager.generate(batch)[0]
+            result = self.manager.generate(
+                batch,
+                max_output_tokens=self.max_output_tokens,
+            )[0]
 
         raw = getattr(result, "raw", None)
         if custom_prompt and raw is not None:
@@ -148,7 +165,9 @@ class ChandraOCR2Adapter(Adapter):
             "method": self.method,
             "prompt_type": self.prompt_type,
             "custom_prompt_enabled": self.custom_prompt_enabled,
+            "max_output_tokens": self.max_output_tokens,
             "cuda": self._cuda,
+            "cuda_available": self._cuda_available,
         }
         try:
             import importlib.metadata
@@ -171,6 +190,8 @@ class ChandraOCR2Adapter(Adapter):
 
 
 def build(model_cfg: dict) -> ChandraOCR2Adapter:
+    decode = model_cfg.get("decode", {})
+    max_output_tokens = decode.get("max_output_tokens", decode.get("max_new_tokens"))
     return ChandraOCR2Adapter(
         model_cfg["model_id"],
         method=model_cfg.get("method", "hf"),
@@ -178,4 +199,5 @@ def build(model_cfg: dict) -> ChandraOCR2Adapter:
         custom_prompt_enabled=bool(
             model_cfg.get("custom_prompt") or model_cfg.get("prompt_path")
         ),
+        max_output_tokens=max_output_tokens,
     )
