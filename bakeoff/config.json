@@ -64,6 +64,22 @@
       "prompt_path": "bakeoff/prompts/qwen3vl-tax-markdown-v1.txt",
       "decode": { "temperature": 0.0, "max_new_tokens": 2048, "seed": 0, "min_pixels": 200704, "max_pixels": 1003520 }
     },
+    "qwen3vl_fp8": {
+      "adapter": "qwen3vl_fp8_vllm",
+      "model_id": "Qwen/Qwen3-VL-8B-Instruct-FP8",
+      "accepts": "images",
+      "uses_prompt": true,
+      "exposes_tokens": false,
+      "prompt_path": "bakeoff/prompts/qwen3vl-tax-markdown-v1.txt",
+      "decode": {
+        "temperature": 0.0,
+        "max_new_tokens": 2048,
+        "seed": 0,
+        "min_pixels": 200704,
+        "max_pixels": 1003520,
+        "gpu_memory_utilization": 0.70
+      }
+    },
     "chandra_ocr_2": {
       "adapter": "chandra_ocr_2",
       "model_id": "datalab-to/chandra-ocr-2",

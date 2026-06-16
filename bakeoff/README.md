@@ -25,10 +25,11 @@ That covers the shared transformers VLM stack. The other dependency stacks need
 their own env (see "Running without Docker" below) or Docker. See "Gotchas" if
 anything errors.
 
-## Models (9)
+## Models (10)
 | Key | Model | Size | Path | Notes |
 |---|---|---|---|---|
 | `qwen3vl` | Qwen3-VL-8B-Instruct | 8B | images | generational upgrade to qwen25vl; newer transformers |
+| `qwen3vl_fp8` | Qwen3-VL-8B-Instruct-FP8 | 8B | images | FP8 checkpoint via vLLM; same prompt/scoring as qwen3vl |
 | `chandra_ocr_2` | Chandra OCR 2 | 5.3B | images | document OCR/layout model; markdown output; Chandra package |
 | `chandra_ocr_2_custom_prompt` | Chandra OCR 2 | 5.3B | images | same weights with Qwen3-VL-style tax field prompt |
 | `qwen25vl` | Qwen2.5-VL-7B | 7B | images | VRAM ceiling (~16–20 GB) |
@@ -59,6 +60,7 @@ report.py   scores/ -> scorecard                  (CPU)
 - Shared default: `bakeoff/prompt.txt`.
 - Model-specific override: set `prompt_path` in that model's `config.json` stanza.
 - `qwen3vl` uses `bakeoff/prompts/qwen3vl-tax-markdown-v1.txt` so prompt experiments do not affect other models.
+- `qwen3vl_fp8` uses the same prompt as `qwen3vl`, but runs through vLLM because direct Transformers loading is not supported for the FP8 checkpoint.
 - `chandra_ocr_2` keeps Chandra's built-in `ocr_layout` prompt type as the baseline.
 - `chandra_ocr_2_custom_prompt` uses `bakeoff/prompts/chandra-ocr-tax-fields-v1.txt`, matching the Qwen3-VL field prompt style; it remains Track A only, not KIE.
 - Chandra generation is capped in `decode.max_output_tokens`; raise it if the output is truncated.
@@ -208,6 +210,11 @@ if torch.cuda.is_available():
     print("gpu", torch.cuda.get_device_name(0))
 PY
 CUDA_VISIBLE_DEVICES=0 python -u bakeoff/run.py --model chandra_ocr_2 --pages page2
+
+# Qwen3-VL FP8 — vLLM runtime
+micromamba create -n qwen3vl-fp8 python=3.11 -c conda-forge && micromamba activate qwen3vl-fp8
+python -m pip install -r bakeoff/envs/requirements-qwen3vl_fp8.txt
+CUDA_VISIBLE_DEVICES=1 bakeoff/run_qwen3vl_fp8.sh page2
 
 # MinerU — its own pinned stack
 micromamba create -n mineru python=3.11 -c conda-forge && micromamba activate mineru

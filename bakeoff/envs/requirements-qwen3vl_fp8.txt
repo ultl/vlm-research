@@ -1,0 +1,6 @@
+# Qwen3-VL FP8 is not supported by direct Transformers loading yet; use vLLM.
+# qwen-vl-utils 0.0.14+ is required by Qwen's FP8 vLLM example.
+vllm
+transformers>=4.57.0
+qwen-vl-utils>=0.0.14
+pillow==11.0.0
